@@ -41,6 +41,10 @@ void main (void)
   outputColor = globalAmbient;
   intensity = max(dot(vertex_normal, normalize(lightDir)), 0.0);
   if (intensity > 0.0) {
+    float spotEffect;
+
+    spotEffect = dot(normalize(gl_LightSource[0].spotDirection), normalize(-lightDir));
+    if (spotEffect > gl_LightSource[0].spotCosCutoff) {
      // Phong Specular Highlights
      vec3 eyeVector = normalize(-eyeSpaceVertexPos); // in eye space, eye is at (0,0,0)
      // For a given incident vector I and surface normal N,
@@ -53,7 +57,7 @@ void main (void)
      diffuse = gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse;
      ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
      dist = length(lightDir);
-     att = 1.0 / (gl_LightSource[0].constantAttenuation +
+     att = spotEffect / (gl_LightSource[0].constantAttenuation +
 		  gl_LightSource[0].linearAttenuation * dist +
 		  gl_LightSource[0].quadraticAttenuation * dist * dist);
      outputColor += att * (diffuse * intensity + ambient);
@@ -62,6 +66,7 @@ void main (void)
      gl_FrontMaterial.specular *
      gl_LightSource[0].specular;
      outputColor += att * specular;
+    }
   }
   //  outputColor = intensity * diffuse + ambient + specular; // + globalAmbient ;
   outputColor.w = 1.0;
