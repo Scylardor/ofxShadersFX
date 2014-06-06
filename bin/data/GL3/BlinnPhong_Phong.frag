@@ -66,7 +66,7 @@ const vec4 materialDiffuse = vec4(0.8, 0.8, 0.8, 1.);
 const vec4 materialSpecular = vec4(1., 1., 1., 1.);
 const vec4 materialAmbient = vec4(0.0, 0.0, 0.0, 1.);
 const vec4 materialEmission = vec4(0.0, 0.0, 0.0, 1.);
-const float materialShininess = 50.0;
+const float materialShininess = 80.0;
 
 in vec3 vertex_normal, eyePos, lightDir;
 
