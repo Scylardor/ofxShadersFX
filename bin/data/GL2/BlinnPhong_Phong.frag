@@ -115,6 +115,6 @@ void main()
       color += att * gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(NdotHV,gl_FrontMaterial.shininess);
     }
   }
-
+  //  gl_FragColor = vec4(gl_LightSource[0].spotDirection, 1.0);
   gl_FragColor = color;
 }
