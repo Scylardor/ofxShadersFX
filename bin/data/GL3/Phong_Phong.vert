@@ -30,18 +30,34 @@ out vec3 vertex_normal, eyeSpaceVertexPos;
 // }
 
 
-const vec4 lightDiffuse = vec4(1., 0., 0., 1.);
+// const vec4 lightDiffuse = vec4(1., 0., 0., 1.);
+// const vec4 lightSpecular = vec4(1., 1., 1., 1.);
+// const vec4 lightAmbient = vec4(0.,0., 0., 1.);
+// const float lightConstAtt = 0.0;
+// const float lightLinearAtt = 0.005;
+// const float lightQuadraticAtt = 0.0;
+// const vec4 materialDiffuse = vec4(0.8, 0.8, 0.8, 1.);
+// const vec4 materialSpecular = vec4(1., 1., 1., 1.);
+// const vec4 materialAmbient = vec4(0.0, 0.0, 0.0, 1.);
+// const vec4 materialEmission = vec4(0.0, 0.0, 0.0, 1.);
+// const float materialShininess = 50.0;
+// const vec4 globalLighting = vec4(0.0, 0.0, 0.0, 1.);
+
+
+const vec4 lightDiffuse = vec4(0., 1., 0., 1.);
 const vec4 lightSpecular = vec4(1., 1., 1., 1.);
 const vec4 lightAmbient = vec4(0.,0., 0., 1.);
 const float lightConstAtt = 0.0;
 const float lightLinearAtt = 0.005;
 const float lightQuadraticAtt = 0.0;
+const float lightCutoff = 50.0;
+const float lightExponent = 45.0;
+vec3 spotDirection = vec3(0., 0., -0.707107);
 const vec4 materialDiffuse = vec4(0.8, 0.8, 0.8, 1.);
 const vec4 materialSpecular = vec4(1., 1., 1., 1.);
 const vec4 materialAmbient = vec4(0.0, 0.0, 0.0, 1.);
 const vec4 materialEmission = vec4(0.0, 0.0, 0.0, 1.);
 const float materialShininess = 50.0;
-const vec4 globalLighting = vec4(0.0, 0.0, 0.0, 1.);
 
 void main (void)
 {
