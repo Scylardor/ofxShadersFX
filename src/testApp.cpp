@@ -85,7 +85,6 @@ void testApp::setup()
     test.setPosition(0, 50, -100);
     mat.setSpecularColor(ofFloatColor(1.,1.,1.));
     mat.setShininess(50);
-    //mat.setEmissiveColor(ofFloatColor(1.0, 0.0, 0.0));
     ofSetGlobalAmbientColor(ofColor::black);
     pointLight.setPosition(100, 0, -150);
     pointLight.setAttenuation(0.0, 0.005);
@@ -98,8 +97,9 @@ void testApp::setup()
     cout << "spot orientation " << spotLight.getOrientationEuler() << endl;
     cout << "spot lookatdir " << spotLight.getLookAtDir() << endl;
     m_lights.push_back(&pointLight);
-    m_lights.push_back(&spotLight);
+
     m_lights.push_back(&directionalLight);
+     m_lights.push_back(&spotLight);
     lightPropsNumber = 11;
 }
 
@@ -378,8 +378,6 @@ vector<string> testApp::make_attributes_names()
     {
         stringstream ss_lightNumber("");
         string lightNumber;
-        vector<string>::iterator it;
-        size_t old_size = names.size();
 
         ss_lightNumber << i;
         lightNumber = ss_lightNumber.str();
@@ -394,7 +392,6 @@ vector<string> testApp::make_attributes_names()
 void testApp::set_light_position(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets)
 {
     int offset = offsets[0 + lightIndex * lightPropsNumber]; // lightPropsNumber = number of light props
-    unsigned char * fbuf = &buffer[0];
     ofMatrix4x4 normalMatrix = ofMatrix4x4::getTransposedOf(cam.getModelViewMatrix().getInverse());
     ofVec3f eyeSpaceLightPos = m_lights[lightIndex]->getGlobalPosition() * cam.getModelViewMatrix();
 
@@ -413,14 +410,13 @@ void testApp::set_light_position(size_t lightIndex, vector<unsigned char> & buff
 
 void testApp::set_light_colors(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets)
 {
-    int offset;
-    unsigned char *fbuf = &buffer[0];
+   int offset;
 
     // Light ambient color (vec4)
     offset = offsets[1 + lightIndex * lightPropsNumber];
     for (int i = 0; i < 3; ++i)
     {
-        *(reinterpret_cast<float*> (&buffer[0] + offset)) = m_lights[lightIndex]->getAmbientColor()[i];
+       *(reinterpret_cast<float*> (&buffer[0] + offset)) = m_lights[lightIndex]->getAmbientColor()[i];
         offset += sizeof (GLfloat);
     }
     *(reinterpret_cast<float*> (&buffer[0] + offset)) = 1.0; // 100% alpha
@@ -444,14 +440,13 @@ void testApp::set_light_colors(size_t lightIndex, vector<unsigned char> & buffer
 
 void testApp::set_light_attenuation(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets)
 {
-    unsigned char *fbuf = &buffer[0];
     int offset;
 
     // Light constant attenuation (float)
     offset = offsets[4 + lightIndex * lightPropsNumber];
     *(reinterpret_cast<float*> (&buffer[0] + offset)) = m_lights[lightIndex]->getAttenuationConstant();
     // Light linear attenuation (float)
-    offset = offsets[5 + lightIndex * lightPropsNumber];
+   offset = offsets[5 + lightIndex * lightPropsNumber];
     *(reinterpret_cast<float*> (&buffer[0] + offset)) = m_lights[lightIndex]->getAttenuationLinear();
     // Light quadratic attenuation (float)
     offset = offsets[6 + lightIndex * lightPropsNumber];
@@ -460,7 +455,6 @@ void testApp::set_light_attenuation(size_t lightIndex, vector<unsigned char> & b
 
 void testApp::set_light_spot_properties(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets)
 {
-    unsigned char *fbuf = &buffer[0];
     int offset;
     ofVec4f spotDir = ofVec4f(0., 0., -1., 1.);
 
