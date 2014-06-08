@@ -20,11 +20,14 @@ public:
     void gotMessage(ofMessage msg);
 
     void lights_Shader();
+    void setup_lights();
+    void setup_material();
     vector<string> make_attributes_names();
-    void set_light_position(size_t lightIndex, vector<float> & buffer, const GLint * offsets);
-    void set_light_colors(size_t lightIndex, vector<float> & buffer, const GLint * offsets);
-    void set_light_attenuation(size_t lightIndex, vector<float> & buffer, const GLint * offsets);
-    void set_light_spot_properties(size_t lightIndex, vector<float> & buffer, const GLint * offsets);
+    void set_light_position(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
+    void set_light_colors(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
+    void set_light_attenuation(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
+    void set_light_spot_properties(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
+    void set_material_properties(vector<unsigned char> & buffer, const GLint * offsets);
 
     ofLight pointLight;
 	ofLight spotLight;
@@ -46,4 +49,5 @@ public:
     ofSpherePrimitive test;
     ofMaterial mat;
     vector<ofLight *> m_lights;
+    size_t lightPropsNumber;
 };

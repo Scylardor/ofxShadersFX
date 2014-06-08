@@ -111,7 +111,7 @@ vec4 calc_lighting_color(in vec3 normal) {
     }
     else {
       if (gl_LightSource[i].spotCutoff <= 90.0) {
-	lightingColor +=spot_light(i, normal);
+	lightingColor += spot_light(i, normal);
       }
       else {
 	lightingColor += point_light(i, normal);
