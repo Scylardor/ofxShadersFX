@@ -308,14 +308,9 @@ void testApp::setup_lights()
     glGenBuffers(1, &lights_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, lights_ubo);
 
-    const GLchar *uniformNames[1] = { "Lights.light" };
-    GLuint uniformIndices;
-
-    glGetUniformIndices(shader.getProgram(), 1, uniformNames, &uniformIndices);
-
-    GLint uniformOffsets[1];
-
-    glGetActiveUniformsiv(shader.getProgram(), 1, &uniformIndices, GL_UNIFORM_OFFSET, uniformOffsets);
+    const GLchar *uniformNames[1] = {
+        "Lights.light",
+    };
 
     GLuint uniformBlockIndex = glGetUniformBlockIndex (shader.getProgram(), "Lights");
     GLsizei uniformBlockSize(0);
@@ -486,15 +481,11 @@ void testApp::set_light_spot_properties(size_t lightIndex, vector<unsigned char>
     offset = offsets[9 + lightIndex * lightPropsNumber];
     if (m_lights[lightIndex]->getIsSpotlight()) {
         *(reinterpret_cast<float*> (&buffer[0] + offset)) = cos(ofDegToRad(m_lights[lightIndex]->getSpotlightCutOff()));
-    } else {
-        *(reinterpret_cast<float*> (&buffer[0] + offset)) = 0.0;
     }
     // Light spot exponent (float)
     offset = offsets[10 + lightIndex * lightPropsNumber];
     if (m_lights[lightIndex]->getIsSpotlight()) {
         *(reinterpret_cast<float*> (&buffer[0] + offset)) = m_lights[lightIndex]->getSpotConcentration();
-    } else {
-        *(reinterpret_cast<float*> (&buffer[0] + offset)) = 128.0;
     }
 
 }
@@ -584,7 +575,4 @@ void testApp::set_material_properties(vector<unsigned char> & buffer, const GLin
     offset = offsets[4];
     *(reinterpret_cast<float *> (&buffer[0] + offset)) =
         mat.getShininess();
-
-
-
 }

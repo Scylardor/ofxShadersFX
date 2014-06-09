@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxShadersFX.h"
 
 class testApp : public ofBaseApp{
 
