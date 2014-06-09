@@ -16,12 +16,17 @@ namespace Lighting
 class LightingShader : public Shader
 {
 public:
-    LightingShader(LightingMethod method, ShaderType type=PIXEL_SHADER,
+    LightingShader(LightingMethod method=BLINNPHONG, ShaderType type=PIXEL_SHADER,
                    ofCamera * cam=NULL, ofMaterial * material=NULL);
     ~LightingShader();
 
     void begin();
     void end();
+
+    LightingMethod method();
+    void setType(ShaderType p_type);
+
+    void setMethod(LightingMethod method);
     void useLight(ofLight * light);
     void useLights(const vector<ofLight*> & lights, bool replace=true);
     void removeLight(ofLight * light);
@@ -45,9 +50,9 @@ private:
     // Maximum number of lights
     // 8 is set to mimic legacy OpenGL limits, but
     // could be overridden
-    static const int MAX_LIGHTS = 8;
+    static const size_t MAX_LIGHTS = 8;
     // Number of light properties in the shaders
-    static const int LIGHT_PROPS_NUMBER = 11;
+    static const size_t LIGHT_PROPS_NUMBER = 11;
     // static map to choose the right shader for the right method
     static map<LightingMethod, string> shader_paths;
     LightingMethod m_method;

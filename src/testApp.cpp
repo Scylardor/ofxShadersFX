@@ -99,8 +99,13 @@ void testApp::setup()
     m_lights.push_back(&pointLight);
 
     m_lights.push_back(&directionalLight);
-     m_lights.push_back(&spotLight);
+    m_lights.push_back(&spotLight);
     lightPropsNumber = 11;
+    blinnphong.useLight(&pointLight);
+    blinnphong.useLight(&directionalLight);
+    blinnphong.useLight(&spotLight);
+    blinnphong.useMaterial(&mat);
+    blinnphong.useCamera(&cam);
 }
 
 //--------------------------------------------------------------
@@ -118,24 +123,27 @@ void testApp::draw()
 
     // enable lighting //
     cam.begin();
-    ofEnableLighting();
+   // ofEnableLighting();
+    blinnphong.begin();
 
-    lights_Shader();
-    mat.begin();
+
+   // lights_Shader();
+   // mat.begin();
 
     sphere.draw();
     test.draw();
-    shader.end();
+    blinnphong.end();
+ // shader.end();
     //sphere.drawNormals(10, true);
 
-    mat.end();
+  // mat.end();
 
-    if (!bPointLight) pointLight.disable();
-    if (!bSpotLight) spotLight.disable();
-    if (!bDirLight) directionalLight.disable();
+   // if (!bPointLight) pointLight.disable();
+   // if (!bSpotLight) spotLight.disable();
+   // if (!bDirLight) directionalLight.disable();
 
     // turn off lighting //
-    ofDisableLighting();
+   // ofDisableLighting();
 
     ofPushStyle();
     ofSetColor(directionalLight.getDiffuseColor());
@@ -145,7 +153,7 @@ void testApp::draw()
     if(bPointLight) pointLight.draw();
 
     ofSetColor(255, 255, 255);
-    ofSetColor( spotLight.getDiffuseColor() );
+    ofSetColor(spotLight.getDiffuseColor() );
     if(bSpotLight) spotLight.draw();
     cam.end();
     ofSetColor(255, 255, 255);
@@ -307,15 +315,6 @@ void testApp::setup_lights()
 
     glGenBuffers(1, &lights_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, lights_ubo);
-
-    const GLchar *uniformNames[1] = { "Lights.light" };
-    GLuint uniformIndices;
-
-    glGetUniformIndices(shader.getProgram(), 1, uniformNames, &uniformIndices);
-
-    GLint uniformOffsets[1];
-
-    glGetActiveUniformsiv(shader.getProgram(), 1, &uniformIndices, GL_UNIFORM_OFFSET, uniformOffsets);
 
     GLuint uniformBlockIndex = glGetUniformBlockIndex (shader.getProgram(), "Lights");
     GLsizei uniformBlockSize(0);
@@ -486,15 +485,11 @@ void testApp::set_light_spot_properties(size_t lightIndex, vector<unsigned char>
     offset = offsets[9 + lightIndex * lightPropsNumber];
     if (m_lights[lightIndex]->getIsSpotlight()) {
         *(reinterpret_cast<float*> (&buffer[0] + offset)) = cos(ofDegToRad(m_lights[lightIndex]->getSpotlightCutOff()));
-    } else {
-        *(reinterpret_cast<float*> (&buffer[0] + offset)) = 0.0;
     }
     // Light spot exponent (float)
     offset = offsets[10 + lightIndex * lightPropsNumber];
     if (m_lights[lightIndex]->getIsSpotlight()) {
         *(reinterpret_cast<float*> (&buffer[0] + offset)) = m_lights[lightIndex]->getSpotConcentration();
-    } else {
-        *(reinterpret_cast<float*> (&buffer[0] + offset)) = 128.0;
     }
 
 }
@@ -584,7 +579,4 @@ void testApp::set_material_properties(vector<unsigned char> & buffer, const GLin
     offset = offsets[4];
     *(reinterpret_cast<float *> (&buffer[0] + offset)) =
         mat.getShininess();
-
-
-
 }
