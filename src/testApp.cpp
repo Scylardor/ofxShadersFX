@@ -99,8 +99,13 @@ void testApp::setup()
     m_lights.push_back(&pointLight);
 
     m_lights.push_back(&directionalLight);
-     m_lights.push_back(&spotLight);
+    m_lights.push_back(&spotLight);
     lightPropsNumber = 11;
+    blinnphong.useLight(&pointLight);
+    blinnphong.useLight(&directionalLight);
+    blinnphong.useLight(&spotLight);
+    blinnphong.useMaterial(&mat);
+    blinnphong.useCamera(&cam);
 }
 
 //--------------------------------------------------------------
@@ -118,24 +123,27 @@ void testApp::draw()
 
     // enable lighting //
     cam.begin();
-    ofEnableLighting();
+   // ofEnableLighting();
+    blinnphong.begin();
 
-    lights_Shader();
-    mat.begin();
+
+   // lights_Shader();
+   // mat.begin();
 
     sphere.draw();
     test.draw();
-    shader.end();
+    blinnphong.end();
+ // shader.end();
     //sphere.drawNormals(10, true);
 
-    mat.end();
+  // mat.end();
 
-    if (!bPointLight) pointLight.disable();
-    if (!bSpotLight) spotLight.disable();
-    if (!bDirLight) directionalLight.disable();
+   // if (!bPointLight) pointLight.disable();
+   // if (!bSpotLight) spotLight.disable();
+   // if (!bDirLight) directionalLight.disable();
 
     // turn off lighting //
-    ofDisableLighting();
+   // ofDisableLighting();
 
     ofPushStyle();
     ofSetColor(directionalLight.getDiffuseColor());
@@ -145,7 +153,7 @@ void testApp::draw()
     if(bPointLight) pointLight.draw();
 
     ofSetColor(255, 255, 255);
-    ofSetColor( spotLight.getDiffuseColor() );
+    ofSetColor(spotLight.getDiffuseColor() );
     if(bSpotLight) spotLight.draw();
     cam.end();
     ofSetColor(255, 255, 255);
@@ -307,10 +315,6 @@ void testApp::setup_lights()
 
     glGenBuffers(1, &lights_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, lights_ubo);
-
-    const GLchar *uniformNames[1] = {
-        "Lights.light",
-    };
 
     GLuint uniformBlockIndex = glGetUniformBlockIndex (shader.getProgram(), "Lights");
     GLsizei uniformBlockSize(0);

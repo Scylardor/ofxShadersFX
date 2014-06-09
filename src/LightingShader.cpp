@@ -8,10 +8,9 @@ LightingShader::LightingShader(LightingMethod p_method, ShaderType p_type,
                                ofCamera * p_cam, ofMaterial * p_material)
     : Shader(p_type)
 {
-    m_method = p_method;
     m_cam = p_cam;
     m_mat = p_material;
-    this->load(getShaderName());
+    setMethod(p_method);
 }
 
 LightingShader::~LightingShader()
@@ -20,8 +19,62 @@ LightingShader::~LightingShader()
 
 }
 
+LightingMethod LightingShader::method() {
+    return m_method;
+}
+
+void LightingShader::setMethod(LightingMethod p_method) {
+    m_method = p_method;
+    this->unload();
+    this->load(getShaderName());
+}
+
+void LightingShader::setType(ShaderType p_type) {
+    Shader::setType(p_type);
+    this->unload();
+    this->load(getShaderName());
+}
+
+
+string LightingShader::getShaderName()
+{
+    string shaderName("ofxShadersFX/");
+
+    if (ofIsGLProgrammableRenderer())
+    {
+        shaderName += "GLSL330/";
+    }
+    else
+    {
+        shaderName += "GLSL120/";
+    }
+    switch (m_method)
+    {
+    case PHONG:
+        shaderName += "Lighting/Phong_";
+        break;
+    case BLINNPHONG:
+        shaderName += "Lighting/BlinnPhong_";
+        break;
+    }
+    if (this->type() == PIXEL_SHADER)
+    {
+        shaderName += "pixelShader";
+    }
+    else
+    {
+        shaderName += "vertexShader";
+    }
+    return shaderName;
+}
+
+
+
 void LightingShader::begin()
 {
+    if (this->isLoaded() == false) {
+        this->load(getShaderName());
+    }
     Shader::begin();
     if (m_cam != NULL)
     {
@@ -104,45 +157,14 @@ void LightingShader::removeCamera()
     m_cam = NULL;
 }
 
-string LightingShader::getShaderName()
-{
-    string shaderName("ofxShadersFX/");
-
-    if (ofIsGLProgrammableRenderer())
-    {
-        shaderName += "GLSL330/";
-    }
-    else
-    {
-        shaderName += "GLSL120/";
-    }
-    switch (m_method)
-    {
-    case PHONG:
-        shaderName += "Lighting/Phong_";
-        break;
-    case BLINNPHONG:
-        shaderName += "Lighting/BlinnPhong_";
-        break;
-    }
-    if (this->type() == PIXEL_SHADER)
-    {
-        shaderName += "pixelShader";
-    }
-    else
-    {
-        shaderName += "vertexShader";
-    }
-    return shaderName;
-}
-
-
 void LightingShader::setupLights()
 {
     this->setUniform1i("lightsNumber", m_lights.size());
     if (ofIsGLProgrammableRenderer())
     {
         m_normalMatrix = ofMatrix4x4::getTransposedOf(m_cam->getModelViewMatrix().getInverse());
+        this->setUniformMatrix4f("normalMatrix", m_normalMatrix);
+
         GLuint lights_ubo;
 
         glGenBuffers(1, &lights_ubo);

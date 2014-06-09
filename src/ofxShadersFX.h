@@ -23,3 +23,5 @@ protected:
     ShaderType m_type;
 };
 }
+
+#include "ofxShadersFX_LightingShader.h"

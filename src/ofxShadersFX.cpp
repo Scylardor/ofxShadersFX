@@ -1,10 +1,10 @@
 #include "ofxShadersFX.h"
 
 namespace ofxShadersFX {
-    Shader::Shader(ShaderType type)
+    Shader::Shader(ShaderType p_type)
     : ofShader()
     {
-        m_type = type;
+        setType(p_type);
     }
 
     Shader::~Shader()
@@ -22,5 +22,9 @@ namespace ofxShadersFX {
 
     ShaderType Shader::type() const {
         return m_type;
+    }
+
+    void Shader::setType(ShaderType p_type) {
+        m_type = p_type;
     }
 }
