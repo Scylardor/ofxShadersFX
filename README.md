@@ -6,6 +6,7 @@ Shader effects made easy in openFrameworks
 ofxShadersFX is an addon for openFrameworks (0.8.0+) to ease the use of common-used shaders in 3D scenes.
 
 Its goal is to provide a simple, unified interface for a wide variety of shaders that work with both the old renderer using OpenGL fixed-pipeline functionality and the new OpenGL Core programmable pipeline.
+
 Also, as frequently as possible, two versions of each shader are available: a vertex shader one and a pixel shader one (especially with *Lighting* shaders). This also makes ofxShadersFX a great tool for study purposes, to analyze the differences and advantages between two ways of doing the same thing.
 
 *Note*: ofxShadersFX does *not* pretend to use the most performant or the most customisable shaders in the world ! It is just an interface to make the use and study of shaders easier.
@@ -19,8 +20,9 @@ Features
 --------
 
 So far, the following effects are available with ofxShadersFX:
-- *Lighting*: Phong illumination (Vertex and Pixel shader)
-- *Lighting*: Blinn-Phong illumination (Vertex and pixel shader)
+- *Lighting*
+    - Phong illumination (Vertex and Pixel shader)
+    - Blinn-Phong illumination (Vertex and pixel shader)
 
 The following effects are planned:
 - *Lighting*
@@ -49,10 +51,11 @@ Let's go through a quick tutorial on how to start using ofxShadersFX. First:
 
 - Download or clone the ofxShadersFX git repository in your openFrameworks `addons` folder.
 - Create a new openFrameworks project using the project generator, make sure ofxShadersFX is enabled and selected from the list of addons shown.
+- Be sure to copy the contents of the addon's ```data/``` folder to your own project's ```data/``` folder.
 - Open your project with you IDE of choice.
 - Now select your ofApp.h file, and add `#include "ofxShadersFX.h"` under `#include "ofMain.h"`.
 
-Now, in this tutorial, we're taking the example of a Phong vertex shader.
+Now, in this tutorial, we're taking the example of a Phong lighting vertex shader.
 
 Declare in your ofApp a LightingShader attribute:
 
@@ -98,7 +101,7 @@ phong.useMaterial(&mat)
 
 And then you're done with it.
 
-*Note 1*: that you only have to do it once (in the ```setup``` function for example), and the shader will remember to use these when it works. If you want to stop using your camera, light, or material, just call ```removeCamera```, ```removeLight``` or ```removeMaterial```. You don't have to pass any parameter to ```removeCamera``` or ```removeMaterial```, since a lighting shader can actually use only one of these, if you tell it to remove them, it will simply discard them.
+*Note 1*: you only have to do all this once (in the ```setup``` function for example), and the shader will remember to use these when it works. If you want to stop using your camera, light, or material, just call ```removeCamera```, ```removeLight``` or ```removeMaterial```. You don't have to pass any parameter to ```removeCamera``` or ```removeMaterial```, since a lighting shader can actually use only one of these, if you tell it to remove them, it will simply discard them.
 
 *Note 2*: all the parameters are pointers, so you have to pass the address (with the ```&```) of objects. If these are dynamically allocated objects (with ```new```), that's your job to ```delete``` them when you want to discard them. However, for *lights*, be sure to do it *after* having removed them from the shader ! Oh, and ```delete``` a pointer you passed to the shader without removing it will probably make your application crash. Be careful !
 
