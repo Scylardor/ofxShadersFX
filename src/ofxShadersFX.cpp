@@ -2,22 +2,24 @@
 
 namespace ofxShadersFX {
     Shader::Shader(ShaderType p_type)
-    : ofShader()
     {
         setType(p_type);
+        m_shader = new ofShader();
     }
 
     Shader::~Shader()
     {
-
+        if (m_shader) {
+            delete m_shader;
+        }
     }
 
     void Shader::begin() {
-        ofShader::begin();
+        m_shader->begin();
     }
 
     void Shader::end() {
-        ofShader::end();
+        m_shader->end();
     }
 
     ShaderType Shader::type() const {

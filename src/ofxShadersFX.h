@@ -8,7 +8,7 @@ namespace ofxShadersFX {
     PIXEL_SHADER
   }	ShaderType;
 
-class Shader : public ofShader {
+class Shader {
 public:
     Shader(ShaderType type=PIXEL_SHADER);
     ~Shader();
@@ -21,6 +21,7 @@ public:
 
 protected:
     ShaderType m_type;
+    ofShader *m_shader;
 };
 }
 
