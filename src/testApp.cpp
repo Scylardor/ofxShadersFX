@@ -23,7 +23,7 @@ void testApp::setup()
 
     // Point lights emit light in all directions //
     // set the diffuse color, color reflected from the light source //
-    pointLight.setDiffuseColor( ofColor(255.f, 0.f, 0.f));
+    pointLight.setDiffuseColor( ofColor::white);
 
     // specular color, the highlight/shininess color //
     pointLight.setSpecularColor( ofColor(255.f, 255.f, 255.f));
@@ -62,7 +62,7 @@ void testApp::setup()
 
     bShiny = true;
     // shininess is a value between 0 - 128, 128 being the most shiny //
-    material.setShininess( 120 );
+   // material.setShininess( 120 );
     material.setDiffuseColor(ofColor(10.0f,200.0f,0.0f,255));
     // the light highlight of the material //
     material.setSpecularColor(ofColor(255, 255, 255, 255));
@@ -82,9 +82,14 @@ void testApp::setup()
     bDirLight = true;
     directionalLight.setPosition(100, 100, 0);
     sphere.setPosition(0, 0, -100);
+    box.setPosition(0, 0, -100);
+    box.setHeight(15);
+    box.setWidth(15);
+    box.setDepth(15);
     test.setPosition(0, 50, -100);
     mat.setSpecularColor(ofFloatColor(1.,1.,1.));
-    mat.setShininess(50);
+    mat.setShininess(120);
+    mat.setEmissiveColor(ofFloatColor(0.1,0.1,0.1));
     ofSetGlobalAmbientColor(ofColor::black);
     pointLight.setPosition(100, 0, -150);
     pointLight.setAttenuation(0.0, 0.005);
@@ -103,27 +108,28 @@ void testApp::setup()
     lightPropsNumber = 11;
     blinnphong.useLight(&pointLight);
     blinnphong.useLight(&directionalLight);
-    blinnphong.useLight(&spotLight);
+   blinnphong.useLight(&spotLight);
     blinnphong.useMaterial(&mat);
     blinnphong.useCamera(&cam);
+    tex = ofImage("earth.jpg");
+  //  blinnphong.setType(ofxShadersFX::VERTEX_SHADER);
+   // blinnphong.setMethod(ofxShadersFX::Lighting::PHONG);
+   sphere.mapTexCoordsFromTexture(tex.getTextureReference());
+   blinnphong.useTexture(&tex);
 }
 
 //--------------------------------------------------------------
 void testApp::update()
 {
-//   ofVec3f lookAtDir = (spotLight.getGlobalTransformMatrix().getInverse() * ofVec4f(0,0,-1, 1));
 
-    //  cout << lookAtDir << endl;
 }
 
 //--------------------------------------------------------------
 void testApp::draw()
 {
-
-
     // enable lighting //
     cam.begin();
-   // ofEnableLighting();
+    //tex.getTextureReference().bind();
     blinnphong.begin();
 
 
@@ -131,19 +137,26 @@ void testApp::draw()
    // mat.begin();
 
     sphere.draw();
-    test.draw();
+
+    //box.draw();
     blinnphong.end();
- // shader.end();
-    //sphere.drawNormals(10, true);
+  //tex.getTextureReference().unbind();
+    ofEnableLighting();
 
-  // mat.end();
+    if (bPointLight) pointLight.enable();
+    if (bSpotLight) spotLight.enable();
+    if (bDirLight) directionalLight.enable();
+    mat.begin();
+    test.draw();
 
-   // if (!bPointLight) pointLight.disable();
-   // if (!bSpotLight) spotLight.disable();
-   // if (!bDirLight) directionalLight.disable();
+   mat.end();
+
+    if (bPointLight) pointLight.disable();
+    if (bSpotLight) spotLight.disable();
+    if (bDirLight) directionalLight.disable();
 
     // turn off lighting //
-   // ofDisableLighting();
+    ofDisableLighting();
 
     ofPushStyle();
     ofSetColor(directionalLight.getDiffuseColor());
@@ -157,7 +170,7 @@ void testApp::draw()
     if(bSpotLight) spotLight.draw();
     cam.end();
     ofSetColor(255, 255, 255);
-    ofDrawBitmapString("Point Light On (1) : "+ofToString(bPointLight) +"\n"+
+    ofDrawBitmapString("Shininess : "+ofToString(mat.getShininess()) +"\n"+
                        "Spot Light On (2) : "+ofToString(bSpotLight) +"\n"+
                        "Directional Light On (3) : "+ofToString(bDirLight)+"\n"+
                        "Shiny Objects On (s) : "+ofToString(bShiny)+"\n"+
@@ -187,17 +200,31 @@ void testApp::keyPressed(int key)
         break;
     case 's':
         bShiny	= !bShiny;
-        if (bShiny) material.setShininess( 120 );
-        else material.setShininess( 30 );
+//        if (bShiny) material.setShininess( 120 );
+//        else material.setShininess( 30 );
+        if (blinnphong.method() == ofxShadersFX::Lighting::PHONG) {
+                blinnphong.setMethod(ofxShadersFX::Lighting::BLINNPHONG);
+        }
+        else {
+            blinnphong.setMethod(ofxShadersFX::Lighting::PHONG);
+        }
         break;
     case 'x':
         bSmoothLighting = !bSmoothLighting;
         ofSetSmoothLighting(bSmoothLighting);
         break;
     case 't':
+        if (blinnphong.type() == ofxShadersFX::VERTEX_SHADER) {
+            blinnphong.setType(ofxShadersFX::PIXEL_SHADER);
+        }
+        else {
+            blinnphong.setType(ofxShadersFX::VERTEX_SHADER);
+        }
+
         bUseTexture = !bUseTexture;
         break;
     case OF_KEY_UP:
+        mat.setShininess(mat.getShininess()+1);
         pos = test.getPosition();
         pos[0] += 10;
         // test.setPosition(pos);
@@ -206,6 +233,7 @@ void testApp::keyPressed(int key)
         //spotLight.setSpotConcentration(spotLight.getSpotConcentration()+1);
         break;
     case OF_KEY_DOWN:
+        mat.setShininess(mat.getShininess()-1);
         pos = test.getPosition();
         pos[0] -= 10;
         // test.setPosition(pos);
@@ -214,6 +242,7 @@ void testApp::keyPressed(int key)
         //spotLight.setSpotConcentration(spotLight.getSpotConcentration()-1);
         break;
     case OF_KEY_RIGHT:
+        //mat.setShininess(120);
         pos = sphere.getPosition();
         pos[2] += 10;
         //sphere.setPosition(pos);

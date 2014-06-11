@@ -17,15 +17,21 @@ class LightingShader : public Shader
 {
 public:
     LightingShader(LightingMethod method=BLINNPHONG, ShaderType type=PIXEL_SHADER,
-                   ofCamera * cam=NULL, ofMaterial * material=NULL);
+                   ofCamera * cam=NULL, ofMaterial * material=NULL, ofImage * image=NULL);
     ~LightingShader();
 
     void begin();
     void end();
 
+    string getShaderName();
     LightingMethod method();
-    void setType(ShaderType p_type);
+    ofCamera * camera();
+    const vector<ofLight *> & lights();
+    ofLight * light(size_t index);
+    ofMaterial * material();
+    ofImage * texture();
 
+    void setType(ShaderType p_type);
     void setMethod(LightingMethod method);
     void useLight(ofLight * light);
     void useLights(const vector<ofLight*> & lights, bool replace=true);
@@ -33,10 +39,12 @@ public:
     void useMaterial(ofMaterial * material);
     void removeMaterial();
     void useCamera(ofCamera * cam);
+    void useTexture(ofImage * image);
+    void removeTexture();
     void removeCamera();
 
 private:
-    string getShaderName();
+
     void setupLights();
     vector<string> generateLightPropsNames();
     void setLightPosition(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
@@ -59,6 +67,7 @@ private:
     vector<ofLight *> m_lights;
     ofMaterial * m_mat;
     ofCamera * m_cam;
+    ofImage * m_tex;
     ofMatrix4x4 m_normalMatrix;
 };
 }

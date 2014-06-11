@@ -36,23 +36,17 @@ uniform vec3 cameraSpaceLightPos; // already in eye space
 
 in vec4 position; // in local space
 in vec3 normal; // in local space
-
-const vec4 lightDiffuse = vec4(1., 0., 0., 1.);
-const vec4 lightSpecular = vec4(1., 1., 1., 1.);
-const vec4 lightAmbient = vec4(0.,0., 0., 1.);
-const vec4 materialDiffuse = vec4(0.8, 0.8, 0.8, 1.);
-const vec4 materialSpecular = vec4(1., 1., 1., 1.);
-const vec4 materialAmbient = vec4(0.2, 0.2, 0.2, 1.);
-const vec4 materialEmission = vec4(0., 0., 0., 1.);
-const float materialShininess = 50.0;
+in vec2 texcoord;
 
 out vec4 eyeSpaceVertexPos, ambientGlobal;
 out vec3 vertex_normal, interp_eyePos;
+out vec2 varyingtexcoord;
 
-void main () {
+void main() {
   ambientGlobal = material.emission; // no global lighting for the moment
   eyeSpaceVertexPos = modelViewMatrix * position;
   vertex_normal = normalize((normalMatrix * vec4(normal, 0.0)).xyz);
   interp_eyePos = vec3(-eyeSpaceVertexPos);
+  varyingtexcoord = vec2(texcoord.x, texcoord.y);
   gl_Position = modelViewProjectionMatrix * position;
 }

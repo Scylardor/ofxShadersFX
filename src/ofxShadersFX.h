@@ -16,12 +16,13 @@ public:
     void begin();
     void end();
     ShaderType type() const;
+    virtual string getShaderName() = 0;
 
     void setType(ShaderType type);
 
 protected:
     ShaderType m_type;
-    ofShader *m_shader;
+    ofShader m_shader;
 };
 }
 

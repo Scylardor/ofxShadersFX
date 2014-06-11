@@ -5,11 +5,12 @@ namespace ofxShadersFX
 namespace Lighting
 {
 LightingShader::LightingShader(LightingMethod p_method, ShaderType p_type,
-                               ofCamera * p_cam, ofMaterial * p_material)
+                               ofCamera * p_cam, ofMaterial * p_material, ofImage *p_tex)
     : Shader(p_type)
 {
     m_cam = p_cam;
     m_mat = p_material;
+    m_tex = p_tex;
     setMethod(p_method);
 }
 
@@ -23,21 +24,54 @@ LightingMethod LightingShader::method() {
     return m_method;
 }
 
+
+ofCamera * LightingShader::camera() {
+    return m_cam;
+}
+
+
+const vector<ofLight *> & LightingShader::lights() {
+    return m_lights;
+}
+
+
+ofLight * LightingShader::light(size_t p_index) {
+    ofLight *ret = NULL;
+
+    if (p_index < m_lights.size()) {
+        ret = m_lights[p_index];
+    }
+    else {
+        /// TODO ofLog warning
+    }
+    return ret;
+}
+
+
+ofMaterial * LightingShader::material() {
+    return m_mat;
+}
+
+
+ofImage * LightingShader::texture() {
+    return m_tex;
+}
+
+
 void LightingShader::setMethod(LightingMethod p_method) {
     m_method = p_method;
-    m_shader->unload();
-    delete m_shader;
-    m_shader = new ofShader();
-    m_shader->load(getShaderName());
+    m_shader.unload();
+    m_shader.load(getShaderName());
 }
+
 
 void LightingShader::setType(ShaderType p_type) {
     Shader::setType(p_type);
-    m_shader->unload();
-    delete m_shader;
-    m_shader = new ofShader();
-    m_shader->load(getShaderName());
+    m_shader.unload();
+    m_shader.load(getShaderName());
 }
+
+
 
 
 string LightingShader::getShaderName()
@@ -76,8 +110,11 @@ string LightingShader::getShaderName()
 
 void LightingShader::begin()
 {
-    if (m_shader->isLoaded() == false) {
-        m_shader->load(getShaderName());
+    if (m_shader.isLoaded() == false) {
+        m_shader.load(getShaderName());
+    }
+    if (m_tex != NULL) {
+        m_tex->bind();
     }
     Shader::begin();
     if (m_cam != NULL)
@@ -98,6 +135,9 @@ void LightingShader::end()
         }
         m_mat->end();
         ofDisableLighting();
+    }
+    if (m_tex != NULL) {
+        m_tex->unbind();
     }
 }
 
@@ -161,23 +201,34 @@ void LightingShader::removeCamera()
     m_cam = NULL;
 }
 
+
+void LightingShader::useTexture(ofImage * p_img) {
+    m_tex = p_img;
+}
+
+
+void LightingShader::removeTexture() {
+    m_tex = NULL;
+}
+
+
 void LightingShader::setupLights()
 {
-    m_shader->setUniform1i("lightsNumber", m_lights.size());
+    m_shader.setUniform1i("lightsNumber", m_lights.size());
     if (ofIsGLProgrammableRenderer())
     {
         m_normalMatrix = ofMatrix4x4::getTransposedOf(m_cam->getModelViewMatrix().getInverse());
-        m_shader->setUniformMatrix4f("normalMatrix", m_normalMatrix);
+        m_shader.setUniformMatrix4f("normalMatrix", m_normalMatrix);
 
         GLuint lights_ubo;
 
         glGenBuffers(1, &lights_ubo);
         glBindBuffer(GL_UNIFORM_BUFFER, lights_ubo);
 
-        GLuint uniformBlockIndex = glGetUniformBlockIndex (m_shader->getProgram(), "Lights");
+        GLuint uniformBlockIndex = glGetUniformBlockIndex (m_shader.getProgram(), "Lights");
         GLsizei uniformBlockSize(0);
 
-        glGetActiveUniformBlockiv (m_shader->getProgram(), uniformBlockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &uniformBlockSize);
+        glGetActiveUniformBlockiv (m_shader.getProgram(), uniformBlockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &uniformBlockSize);
 
         vector<string> names = generateLightPropsNames();
         vector<const GLchar *> glnames;
@@ -190,11 +241,11 @@ void LightingShader::setupLights()
         const GLchar **glnames_ptr = &glnames[0];
         GLuint indices[glnames.size()];
 
-        glGetUniformIndices(m_shader->getProgram(), glnames.size(), glnames_ptr, indices);
+        glGetUniformIndices(m_shader.getProgram(), glnames.size(), glnames_ptr, indices);
 
         vector<GLint> lightUniformOffsets(glnames.size());
 
-        glGetActiveUniformsiv(m_shader->getProgram(), lightUniformOffsets.size(),
+        glGetActiveUniformsiv(m_shader.getProgram(), lightUniformOffsets.size(),
                               indices, GL_UNIFORM_OFFSET, &lightUniformOffsets[0]);
 
         GLint *offsets = &lightUniformOffsets[0];
@@ -211,7 +262,7 @@ void LightingShader::setupLights()
         }
         glBufferData(GL_UNIFORM_BUFFER, uboSize, &buffer[0], GL_DYNAMIC_DRAW);
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, lights_ubo);
-        glUniformBlockBinding (m_shader->getProgram(), uniformBlockIndex, 0);
+        glUniformBlockBinding (m_shader.getProgram(), uniformBlockIndex, 0);
     }
     else
     {
@@ -389,17 +440,17 @@ void LightingShader::setupMaterial()
 
         GLuint uniformIndices[5];
 
-        glGetUniformIndices (m_shader->getProgram(), 5, uniformNames, uniformIndices);
+        glGetUniformIndices (m_shader.getProgram(), 5, uniformNames, uniformIndices);
 
         GLint uniformOffsets[5];
-        glGetActiveUniformsiv (m_shader->getProgram(), 5, uniformIndices,
+        glGetActiveUniformsiv (m_shader.getProgram(), 5, uniformIndices,
                                GL_UNIFORM_OFFSET, uniformOffsets);
 
-        GLuint uniformBlockIndex = glGetUniformBlockIndex (m_shader->getProgram(),
+        GLuint uniformBlockIndex = glGetUniformBlockIndex (m_shader.getProgram(),
                                    "Material");
         GLsizei uniformBlockSize (0);
 
-        glGetActiveUniformBlockiv (m_shader->getProgram(), uniformBlockIndex,
+        glGetActiveUniformBlockiv (m_shader.getProgram(), uniformBlockIndex,
                                    GL_UNIFORM_BLOCK_DATA_SIZE, &uniformBlockSize);
 
         const unsigned int uboSize (uniformBlockSize);
@@ -409,7 +460,7 @@ void LightingShader::setupMaterial()
 
         glBufferData (GL_UNIFORM_BUFFER, uboSize, &buffer[0], GL_DYNAMIC_DRAW);
         glBindBufferBase (GL_UNIFORM_BUFFER, 1, material_ubo);
-        glUniformBlockBinding (m_shader->getProgram(), uniformBlockIndex, 1);
+        glUniformBlockBinding (m_shader.getProgram(), uniformBlockIndex, 1);
     }
     else
     {
