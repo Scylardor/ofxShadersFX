@@ -32,7 +32,6 @@ uniform Material
 uniform mat4 modelViewProjectionMatrix; // automatically imported by OF
 uniform mat4 modelViewMatrix; // automatically imported by OF
 uniform mat4 normalMatrix; // the normal matrix (the inversed-then-transposed modelView matrix)
-uniform vec3 cameraSpaceLightPos; // already in eye space
 
 in vec4 position; // in local space
 in vec3 normal; // in local space

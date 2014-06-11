@@ -23,7 +23,7 @@ void testApp::setup()
 
     // Point lights emit light in all directions //
     // set the diffuse color, color reflected from the light source //
-    pointLight.setDiffuseColor( ofColor::white);
+    pointLight.setDiffuseColor( ofColor::red);
 
     // specular color, the highlight/shininess color //
     pointLight.setSpecularColor( ofColor(255.f, 255.f, 255.f));
@@ -89,7 +89,7 @@ void testApp::setup()
     test.setPosition(0, 50, -100);
     mat.setSpecularColor(ofFloatColor(1.,1.,1.));
     mat.setShininess(120);
-    mat.setEmissiveColor(ofFloatColor(0.1,0.1,0.1));
+    mat.setEmissiveColor(ofFloatColor(0.1,0.8,0.1));
     ofSetGlobalAmbientColor(ofColor::black);
     pointLight.setPosition(100, 0, -150);
     pointLight.setAttenuation(0.0, 0.005);
@@ -107,13 +107,13 @@ void testApp::setup()
     m_lights.push_back(&spotLight);
     lightPropsNumber = 11;
     blinnphong.useLight(&pointLight);
-    blinnphong.useLight(&directionalLight);
-   blinnphong.useLight(&spotLight);
+   // blinnphong.useLight(&directionalLight);
+   //blinnphong.useLight(&spotLight);
     blinnphong.useMaterial(&mat);
     blinnphong.useCamera(&cam);
     tex = ofImage("earth.jpg");
-  //  blinnphong.setType(ofxShadersFX::VERTEX_SHADER);
-   // blinnphong.setMethod(ofxShadersFX::Lighting::PHONG);
+    blinnphong.setType(ofxShadersFX::VERTEX_SHADER);
+    blinnphong.setMethod(ofxShadersFX::Lighting::PHONG);
    sphere.mapTexCoordsFromTexture(tex.getTextureReference());
    blinnphong.useTexture(&tex);
 }
