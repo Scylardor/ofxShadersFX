@@ -51,8 +51,10 @@ public:
 
     ofEasyCam cam;
     ofSpherePrimitive sphere;
+    ofBoxPrimitive box;
     ofSpherePrimitive test;
     ofMaterial mat;
+    ofImage tex;
     vector<ofLight *> m_lights;
     size_t lightPropsNumber;
     ofxShadersFX::Lighting::LightingShader blinnphong;

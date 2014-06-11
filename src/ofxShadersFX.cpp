@@ -2,7 +2,6 @@
 
 namespace ofxShadersFX {
     Shader::Shader(ShaderType p_type)
-    : ofShader()
     {
         setType(p_type);
     }
@@ -13,11 +12,11 @@ namespace ofxShadersFX {
     }
 
     void Shader::begin() {
-        ofShader::begin();
+        m_shader.begin();
     }
 
     void Shader::end() {
-        ofShader::end();
+        m_shader.end();
     }
 
     ShaderType Shader::type() const {
