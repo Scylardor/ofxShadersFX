@@ -8,10 +8,10 @@ void testApp::setup()
 
     //disable vertical Sync tooo bad with light sometimes!!!!
     ofSetVerticalSync(true);
+    ofDisableArbTex();
     ofSetFrameRate(60);
     ofBackground(10, 10, 10);
     ofEnableDepthTest();
-
 
     // lets make a high-res sphere //
     // default is 20 //
@@ -89,7 +89,7 @@ void testApp::setup()
     test.setPosition(0, 50, -100);
     mat.setSpecularColor(ofFloatColor(1.,1.,1.));
     mat.setShininess(120);
-    mat.setEmissiveColor(ofFloatColor(0.1,0.8,0.1));
+   // mat.setEmissiveColor(ofFloatColor(0.1,0.8,0.1));
     ofSetGlobalAmbientColor(ofColor::black);
     pointLight.setPosition(100, 0, -150);
     pointLight.setAttenuation(0.0, 0.005);
@@ -107,15 +107,17 @@ void testApp::setup()
     m_lights.push_back(&spotLight);
     lightPropsNumber = 11;
     blinnphong.useLight(&pointLight);
-   // blinnphong.useLight(&directionalLight);
-   //blinnphong.useLight(&spotLight);
+    blinnphong.useLight(&directionalLight);
+    blinnphong.useLight(&spotLight);
     blinnphong.useMaterial(&mat);
     blinnphong.useCamera(&cam);
-    tex = ofImage("earth.jpg");
+  //  tex = ofImage("earth.jpg");
+    tex.loadImage("earth.jpg");
     blinnphong.setType(ofxShadersFX::VERTEX_SHADER);
     blinnphong.setMethod(ofxShadersFX::Lighting::PHONG);
-   sphere.mapTexCoordsFromTexture(tex.getTextureReference());
+
    blinnphong.useTexture(&tex);
+   //stest.load("test");
 }
 
 //--------------------------------------------------------------
@@ -131,16 +133,21 @@ void testApp::draw()
     cam.begin();
     //tex.getTextureReference().bind();
     blinnphong.begin();
-
-
+//    if (bPointLight) pointLight.enable();
+//    if (bSpotLight) spotLight.enable();
+//    if (bDirLight) directionalLight.enable();
+//   mat.begin();
+ //  stest.setUniformTexture("colormap", tex, 1);
+  // tex.getTextureReference().bind();
    // lights_Shader();
    // mat.begin();
-
+sphere.mapTexCoordsFromTexture(tex.getTextureReference());
     sphere.draw();
-
+//tex.getTextureReference().unbind();
     //box.draw();
     blinnphong.end();
-  //tex.getTextureReference().unbind();
+ // tex.getTextureReference().unbind();
+  //stest.end();
     ofEnableLighting();
 
     if (bPointLight) pointLight.enable();

@@ -1,6 +1,5 @@
 #version 120
 
-//uniform sampler2D mytex;
 varying vec4 ambientGlobal, eyeSpaceVertexPos;
 varying vec3 vertex_normal;
 

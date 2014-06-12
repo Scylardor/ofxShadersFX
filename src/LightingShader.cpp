@@ -72,8 +72,6 @@ void LightingShader::setType(ShaderType p_type) {
 }
 
 
-
-
 string LightingShader::getShaderName()
 {
     string shaderName("ofxShadersFX/");
@@ -114,6 +112,7 @@ void LightingShader::begin()
         m_shader.load(getShaderName());
     }
     if (m_tex != NULL) {
+        m_shader.setUniformTexture("tex", (*m_tex), 1);
         m_tex->bind();
     }
     Shader::begin();
