@@ -32,7 +32,7 @@ uniform Material
 uniform mat4 modelViewProjectionMatrix; // automatically imported by OF
 uniform mat4 modelViewMatrix; // automatically imported by OF
 uniform mat4 normalMatrix; // the normal matrix (the inversed-then-transposed modelView matrix)
-uniform sampler2DRect tex0;
+uniform sampler2DRect tex;
 uniform int lightsNumber;
 
 in vec2 varyingtexcoord;

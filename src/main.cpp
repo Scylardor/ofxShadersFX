@@ -8,7 +8,7 @@ int main( ){
 
     ofAppGlutWindow window;
 
-    ofSetCurrentRenderer(ofGLProgrammableRenderer::TYPE);
+    //ofSetCurrentRenderer(ofGLProgrammableRenderer::TYPE);
 	ofSetupOpenGL(&window, 1024,768, OF_WINDOW);			// <-------- setup the GL context
     window.setDoubleBuffering(true);
 	// this kicks off the running of my app

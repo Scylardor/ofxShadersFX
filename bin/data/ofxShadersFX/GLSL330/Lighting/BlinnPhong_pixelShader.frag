@@ -32,7 +32,7 @@ uniform Material
 uniform mat4 modelViewProjectionMatrix; // automatically imported by OF
 uniform mat4 modelViewMatrix; // automatically imported by OF
 uniform mat4 normalMatrix; // the normal matrix (the inversed-then-transposed modelView matrix)
-uniform sampler2DRect tex0;
+uniform sampler2DRect tex;
 
 uniform int lightsNumber;
 
@@ -56,7 +56,7 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
     eyeVector = normalize(interp_eyePos);
     lightDir = normalize(eyeSpaceVertexPos.xyz - vec3(lights.light[lightIndex].position.xyz));
     /* The ambient term will always be present */
-    ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex0, varyingtexcoord);
+    ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex, varyingtexcoord);
     outputColor += ambient;
     /* compute light intensity
      * (the dot product between normal and light dir)
@@ -67,7 +67,7 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
        float NdotHV;
 
        diffuse = lights.light[lightIndex].diffuse * material.diffuse;
-       outputColor += diffuse * intensity * texture(tex0, varyingtexcoord);
+       outputColor += diffuse * intensity * texture(tex, varyingtexcoord);
        // compute Blinn-Phong specular component
        halfVector = normalize(lightDir + eyeVector);
        NdotHV = max(dot(normal, halfVector), 0.0);
@@ -100,8 +100,8 @@ vec4 point_light(in int lightIndex, in vec3 normal) {
     att = 1.0 / (lights.light[lightIndex].constant_attenuation +
 		 lights.light[lightIndex].linear_attenuation * dist +
 		 lights.light[lightIndex].quadratic_attenuation * dist * dist);
-    diffuse = material.diffuse * lights.light[lightIndex].diffuse * texture(tex0, varyingtexcoord);
-    ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex0, varyingtexcoord);
+    diffuse = material.diffuse * lights.light[lightIndex].diffuse * texture(tex, varyingtexcoord);
+    ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex, varyingtexcoord);
     pointLightColor += att * (diffuse * intensity + ambient);
     // compute Blinn-Phong specular component
     halfVector = normalize(lightDir - vec3(eyeSpaceVertexPos));
@@ -135,8 +135,8 @@ vec4 spot_light(in int lightIndex, in vec3 normal) {
       att = spotEffect / (lights.light[lightIndex].constant_attenuation +
 			  lights.light[lightIndex].linear_attenuation * dist +
 			  lights.light[lightIndex].quadratic_attenuation * dist * dist);
-      diffuse = material.diffuse * lights.light[lightIndex].diffuse * texture(tex0, varyingtexcoord);
-      ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex0, varyingtexcoord);
+      diffuse = material.diffuse * lights.light[lightIndex].diffuse * texture(tex, varyingtexcoord);
+      ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex, varyingtexcoord);
       spotLightColor += att * (diffuse * intensity + ambient);
       // compute Blinn-Phong specular component
       halfVector = normalize(lightDir - vec3(eyeSpaceVertexPos));
@@ -179,7 +179,7 @@ void main()
 {
   vec3 n;
 
-  fragColor = ambientGlobal * texture(tex0, varyingtexcoord);
+  fragColor = ambientGlobal * texture(tex, varyingtexcoord);
   /* a fragment shader can't write an in variable, hence we need
      a new variable to store the normalized interpolated normal */
   n = normalize(vertex_normal);

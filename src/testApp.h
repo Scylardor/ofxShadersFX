@@ -58,4 +58,5 @@ public:
     vector<ofLight *> m_lights;
     size_t lightPropsNumber;
     ofxShadersFX::Lighting::LightingShader blinnphong;
+    ofShader stest;
 };
