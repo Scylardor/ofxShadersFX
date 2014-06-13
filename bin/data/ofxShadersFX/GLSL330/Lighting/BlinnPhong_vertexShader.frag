@@ -9,6 +9,6 @@ out vec4 fragColor;
 
 void main (void)
 {
-  fragColor = (texture(tex0, varyingtexcoord) * (ambientGlobal + diffuse + ambient)) + specular;
+  fragColor = (texture(tex, varyingtexcoord) * (ambientGlobal + diffuse + ambient)) + specular;
   //  fragColor = outputColor;
 }

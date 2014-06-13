@@ -50,7 +50,7 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
 
   lightDir = vec3(normalize(eyeSpaceVertexPos - lights.light[lightIndex].position));
   /* The ambient term will always be present */
-  ambient = material.ambient * lights.light[lightIndex].ambient  * texture(tex0, varyingtexcoord);
+  ambient = material.ambient * lights.light[lightIndex].ambient  * texture(tex, varyingtexcoord);
   outputColor = ambient;
   /* compute light intensity
    * (the dot product between normal and light dir)
@@ -62,7 +62,7 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
     vec3 eyeVector = normalize(-eyeSpaceVertexPos_n); // in eye space, eye is at (0,0,0)
 
     diffuse = lights.light[lightIndex].diffuse * material.diffuse;
-    outputColor += diffuse * intensity * texture(tex0, varyingtexcoord);
+    outputColor += diffuse * intensity * texture(tex, varyingtexcoord);
     // compute Phong specular component
     reflection = normalize((2.0 * dot(lightDir, normal) * normal) - lightDir);
     specular = pow(max(dot(reflection, eyeVector), 0.0), material.shininess) * material.specular * lights.light[lightIndex].specular;
@@ -94,8 +94,8 @@ vec4 point_light(in int lightIndex, in vec3 normal) {
     att = 1.0 / (lights.light[lightIndex].constant_attenuation +
 		 lights.light[lightIndex].linear_attenuation * dist +
 		 lights.light[lightIndex].quadratic_attenuation * dist * dist);
-    diffuse = material.diffuse * lights.light[lightIndex].diffuse * texture(tex0, varyingtexcoord);
-    ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex0, varyingtexcoord);
+    diffuse = material.diffuse * lights.light[lightIndex].diffuse * texture(tex, varyingtexcoord);
+    ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex, varyingtexcoord);
     pointLightColor += att * (diffuse * intensity + ambient);
     // compute Phong specular component
     reflection = normalize((2.0 * dot(lightDir, normal) * normal) - lightDir);
@@ -131,8 +131,8 @@ vec4 spot_light(in int lightIndex, in vec3 normal) {
       att = spotEffect / (lights.light[lightIndex].constant_attenuation +
 			  lights.light[lightIndex].linear_attenuation * dist +
 			  lights.light[lightIndex].quadratic_attenuation * dist * dist);
-      diffuse = material.diffuse * lights.light[lightIndex].diffuse * texture(tex0, varyingtexcoord);
-      ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex0, varyingtexcoord);
+      diffuse = material.diffuse * lights.light[lightIndex].diffuse * texture(tex, varyingtexcoord);
+      ambient = material.ambient * lights.light[lightIndex].ambient * texture(tex, varyingtexcoord);
       spotLightColor += att * (diffuse * intensity + ambient);
       // compute Phong specular component
       reflection = normalize((2.0 * dot(lightDir, normal) * normal) - lightDir);
@@ -175,7 +175,7 @@ void main()
 {
   vec3 n;
 
-  fragColor = ambientGlobal * texture(tex0, varyingtexcoord);
+  fragColor = ambientGlobal * texture(tex, varyingtexcoord);
   /* a fragment shader can't write an in variable, hence we need
      a new variable to store the normalized interpolated normal */
   n = normalize(vertex_normal);
