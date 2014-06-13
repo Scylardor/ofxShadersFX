@@ -12,63 +12,72 @@ LightingShader::LightingShader(LightingMethod p_method, ShaderType p_type,
     m_mat = p_material;
     m_tex = p_tex;
     setMethod(p_method);
+    m_defaultMat = new ofMaterial();
 }
 
 LightingShader::~LightingShader()
 {
-
+    delete m_defaultMat;
 
 }
 
-LightingMethod LightingShader::method() {
+LightingMethod LightingShader::method()
+{
     return m_method;
 }
 
 
-ofCamera * LightingShader::camera() {
+ofCamera * LightingShader::camera()
+{
     return m_cam;
 }
 
 
-const vector<ofLight *> & LightingShader::lights() {
+const vector<ofLight *> & LightingShader::lights()
+{
     return m_lights;
 }
 
 
-ofLight * LightingShader::light(size_t p_index) {
+ofLight * LightingShader::light(size_t p_index)
+{
     ofLight *ret = NULL;
 
-    if (p_index < m_lights.size()) {
+    if (p_index < m_lights.size())
+    {
         ret = m_lights[p_index];
     }
-    else {
-        /// TODO ofLog warning
+    else
+    {
+        ofLogError() << "ofxShadersFX::LightingShader: No light at index " << p_index << endl;
     }
     return ret;
 }
 
 
-ofMaterial * LightingShader::material() {
+ofMaterial * LightingShader::material()
+{
     return m_mat;
 }
 
 
-ofImage * LightingShader::texture() {
+ofImage * LightingShader::texture()
+{
     return m_tex;
 }
 
 
-void LightingShader::setMethod(LightingMethod p_method) {
+void LightingShader::setMethod(LightingMethod p_method)
+{
     m_method = p_method;
-    m_shader.unload();
-    m_shader.load(getShaderName());
+    this->reload();
 }
 
 
-void LightingShader::setType(ShaderType p_type) {
+void LightingShader::setType(ShaderType p_type)
+{
     Shader::setType(p_type);
-    m_shader.unload();
-    m_shader.load(getShaderName());
+    this->reload();
 }
 
 
@@ -108,18 +117,25 @@ string LightingShader::getShaderName()
 
 void LightingShader::begin()
 {
-    if (m_shader.isLoaded() == false) {
+    if (m_shader.isLoaded() == false)
+    {
         m_shader.load(getShaderName());
     }
-    if (m_tex != NULL) {
+    if (m_tex != NULL)
+    {
         m_shader.setUniformTexture("tex", (*m_tex), 1);
         m_tex->bind();
     }
     Shader::begin();
-    if (m_cam != NULL)
+    // The camera is only necessary in programmable pipeline mode
+    if (m_cam != NULL || ofIsGLProgrammableRenderer() == false)
     {
         setupLights();
         setupMaterial();
+    }
+    else
+    {
+        ofLogError() << "ofxShadersFX::LightingShader: A camera is required in programmable pipeline mode" << endl;
     }
 }
 
@@ -135,35 +151,53 @@ void LightingShader::end()
         m_mat->end();
         ofDisableLighting();
     }
-    if (m_tex != NULL) {
+    if (m_tex != NULL)
+    {
         m_tex->unbind();
     }
 }
 
 void LightingShader::useLight(ofLight * p_light)
 {
-    if (m_lights.size() < MAX_LIGHTS)
+    size_t limit = this->MAX_LIGHTS;
+
+    if (m_lights.size() < limit)
     {
         m_lights.push_back(p_light);
+    }
+    else
+    {
+        ofLogError() << "ofxShadersFX::LightingShader: cannot use more than " << limit << " lights" << endl;
     }
 }
 
 void LightingShader::useLights(const vector<ofLight*> & p_lights, bool p_replace)
 {
+    size_t limit = this->MAX_LIGHTS;
+
     if (p_replace)
     {
-        m_lights = p_lights;
+        if (p_lights.size() <= limit)
+        {
+            m_lights = p_lights;
+        }
+        else
+        {
+            ofLogWarning() << "ofxShadersFX::LightingShader: lights vector is too big. Using only " << limit << " lights." << endl;
+            m_lights.insert(m_lights.begin(), p_lights.begin(), p_lights.begin()+limit);
+        }
     }
     else
     {
-        // Append the vector within the limits of max lights
-        if (p_lights.size() <= MAX_LIGHTS)
+        if (p_lights.size() + m_lights.size() <= limit)
         {
+            // Append the vector within the limits of max lights
             m_lights.insert(m_lights.end(), p_lights.begin(), p_lights.end());
         }
         else
         {
-            m_lights.insert(m_lights.end(), p_lights.begin(), p_lights.begin()+MAX_LIGHTS);
+            ofLogWarning() << "ofxShadersFX::LightingShader: cannot use more than " << limit << " lights." << endl;
+            m_lights.insert(m_lights.end(), p_lights.begin(), p_lights.begin()+(limit-m_lights.size()));
         }
     }
 }
@@ -176,6 +210,9 @@ void LightingShader::removeLight(ofLight * p_light)
     if (light != m_lights.end())
     {
         m_lights.erase(light);
+    }
+    else {
+        ofLogWarning() << "ofxShadersFX::LightingShader: light isn't in this lighting shader" << endl;
     }
 }
 
@@ -201,12 +238,14 @@ void LightingShader::removeCamera()
 }
 
 
-void LightingShader::useTexture(ofImage * p_img) {
+void LightingShader::useTexture(ofImage * p_img)
+{
     m_tex = p_img;
 }
 
 
-void LightingShader::removeTexture() {
+void LightingShader::removeTexture()
+{
     m_tex = NULL;
 }
 
@@ -299,7 +338,6 @@ vector<string> LightingShader::generateLightPropsNames()
 
         ss_lightNumber << i;
         lightNumber = ss_lightNumber.str();
-        // 10 = number of light props
         for (size_t s = 0; s < LIGHT_PROPS_NUMBER; s++)
         {
             names.push_back(string("Lights.light[") + lightNumber + string(props[s]));
@@ -421,6 +459,11 @@ void LightingShader::setLightSpotProperties(size_t lightIndex, vector<unsigned c
 
 void LightingShader::setupMaterial()
 {
+    // if no material provided, use the default one
+    if (m_mat == NULL)
+    {
+        m_mat = m_defaultMat;
+    }
     if (ofIsGLProgrammableRenderer())
     {
         GLuint material_ubo;
@@ -465,7 +508,6 @@ void LightingShader::setupMaterial()
     {
         m_mat->begin();
     }
-
 }
 
 void LightingShader::setMaterialProperties(vector<unsigned char> & buffer, const GLint * offsets)

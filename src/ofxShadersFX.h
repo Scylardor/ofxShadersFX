@@ -11,10 +11,12 @@ namespace ofxShadersFX {
 class Shader {
 public:
     Shader(ShaderType type=PIXEL_SHADER);
-    ~Shader();
+    virtual ~Shader() {}
 
     void begin();
     void end();
+    void reload();
+
     ShaderType type() const;
     virtual string getShaderName() = 0;
 

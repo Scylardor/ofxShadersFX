@@ -106,10 +106,11 @@ void testApp::setup()
     m_lights.push_back(&directionalLight);
     m_lights.push_back(&spotLight);
     lightPropsNumber = 11;
+    //mat = ofMaterial();
     blinnphong.useLight(&pointLight);
     blinnphong.useLight(&directionalLight);
     blinnphong.useLight(&spotLight);
-    blinnphong.useMaterial(&mat);
+   blinnphong.useMaterial(&mat);
     blinnphong.useCamera(&cam);
   //  tex = ofImage("earth.jpg");
     tex.loadImage("earth.jpg");

@@ -6,11 +6,6 @@ namespace ofxShadersFX {
         setType(p_type);
     }
 
-    Shader::~Shader()
-    {
-
-    }
-
     void Shader::begin() {
         m_shader.begin();
     }
@@ -25,5 +20,10 @@ namespace ofxShadersFX {
 
     void Shader::setType(ShaderType p_type) {
         m_type = p_type;
+    }
+
+    void Shader::reload() {
+        this->m_shader.unload();
+        this->m_shader.load(getShaderName());
     }
 }
