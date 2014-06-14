@@ -11,6 +11,5 @@ void main()
   eyeSpaceVertexPos = gl_ModelViewMatrix * gl_Vertex;
   // Global ambient lighting is computed in any case
   ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient + gl_FrontMaterial.emission;
-  gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
   gl_Position = ftransform();
 }

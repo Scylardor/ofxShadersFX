@@ -6,6 +6,7 @@ uniform int lightsNumber;
 varying vec4 ambientGlobal, eyeSpaceVertexPos;
 varying vec3 vertex_normal;
 
+
 vec4 directional_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
   vec4 dirLightColor, diffuse, specular, ambient = vec4(0.0);;
@@ -34,6 +35,7 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
   }
   return dirLightColor;
 }
+
 
 vec4 point_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
@@ -69,6 +71,7 @@ vec4 point_light(in int lightIndex, in vec3 normal) {
   return pointLightColor;
 }
 
+
 vec4 spot_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
   vec4 spotLightColor, diffuse, specular, ambient = vec4(0.0);
@@ -90,6 +93,7 @@ vec4 spot_light(in int lightIndex, in vec3 normal) {
       vec3 eyeVector = normalize(-eyeSpaceVertexPos_n);
       float att, dist;
 
+      spotEffect = pow(spotEffect, gl_LightSource[lightIndex].spotExponent);
       dist = length(lightDir);
       att = spotEffect / (gl_LightSource[lightIndex].constantAttenuation +
 			  gl_LightSource[lightIndex].linearAttenuation * dist +
@@ -106,6 +110,7 @@ vec4 spot_light(in int lightIndex, in vec3 normal) {
   }
   return spotLightColor;
 }
+
 
 vec4 calc_lighting_color(in vec3 normal) {
   vec4 lightingColor = vec4(0.0);

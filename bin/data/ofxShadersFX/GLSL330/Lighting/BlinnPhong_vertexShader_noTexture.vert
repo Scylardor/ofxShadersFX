@@ -36,9 +36,7 @@ uniform int lightsNumber;
 
 in vec4 position; // in local space
 in vec3 normal; // in local space
-in vec2 texcoord;
 out vec4 ambientGlobal, diffuse, ambient, specular;
-out vec2 varyingtexcoord;
 
 vec4 eyeSpaceVertexPos;
 
@@ -171,6 +169,5 @@ void main()
   eyeSpaceVertexPos = modelViewMatrix * position;
   vertex_normal = normalize((normalMatrix * vec4(normal, 0.0)).xyz);
   calc_lighting_color(vertex_normal, diffuse, ambient, specular);
-  varyingtexcoord = vec2(texcoord.x, texcoord.y);
   gl_Position = modelViewProjectionMatrix * position;
 }

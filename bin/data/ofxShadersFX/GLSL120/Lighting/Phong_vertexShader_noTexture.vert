@@ -128,6 +128,5 @@ void main()
   // Global ambient lighting is computed in any case
   ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient + gl_FrontMaterial.emission;
   calc_lighting_color(vertex_normal);
-  gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
   gl_Position = ftransform();
 }

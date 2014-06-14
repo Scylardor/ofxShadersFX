@@ -2,18 +2,19 @@
 
 uniform int lightsNumber;
 
-varying vec4 ambientGlobal, diffuse, ambient, specular;
+varying vec4 ambientGlobal, eyeSpaceVertexPos;
+varying vec3 vertex_normal;
 
-vec4 eyeSpaceVertexPos;
 
-
-void directional_light(in int lightIndex, in vec3 normal) {
+vec4 directional_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
+  vec4 dirLightColor, diffuse, specular, ambient = vec4(0.0);;
   float intensity;
 
   lightDir = normalize(gl_LightSource[lightIndex].position.xyz); // that's already in eye space
+  ambient = gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient ;
   /* The ambient term of a directional light will always be present */
-  ambient += gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient;
+  dirLightColor = ambient;
   /* compute light intensity
    * (the dot product between normal and light dir)
    */
@@ -23,18 +24,24 @@ void directional_light(in int lightIndex, in vec3 normal) {
        vec3 eyeSpaceVertexPos_n = normalize(vec3(eyeSpaceVertexPos));
        vec3 eyeVector = normalize(-eyeSpaceVertexPos_n); // in eye space, eye is at (0,0,0)
 
-       diffuse += gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse * intensity;
+       diffuse = gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse ;
+       dirLightColor += diffuse * intensity;
        // compute Phong specular component
        reflection = normalize((2.0 * dot(lightDir, normal) * normal) - lightDir);
-       specular += pow(max(dot(reflection, eyeVector), 0.0), gl_FrontMaterial.shininess) *
+       specular = pow(max(dot(reflection, eyeVector), 0.0), gl_FrontMaterial.shininess) *
 	 gl_FrontMaterial.specular * gl_LightSource[lightIndex].specular;
+       dirLightColor += specular;
   }
+  return dirLightColor;
 }
 
-void point_light(in int lightIndex, in vec3 normal) {
+
+vec4 point_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
+  vec4 pointLightColor, diffuse, specular, ambient = vec4(0.0);
   float intensity, dist;
 
+  pointLightColor = vec4(0.0);
   // Compute the light direction
   lightDir = vec3(gl_LightSource[lightIndex].position - eyeSpaceVertexPos);
   /* compute the distance to the light source */
@@ -50,21 +57,26 @@ void point_light(in int lightIndex, in vec3 normal) {
     att = 1.0 / (gl_LightSource[lightIndex].constantAttenuation +
 		 gl_LightSource[lightIndex].linearAttenuation * dist +
 		 gl_LightSource[lightIndex].quadraticAttenuation * dist * dist);
-    diffuse += att * gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse * intensity;
-    ambient += att * gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient;
+    diffuse = gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse ;
+    ambient = gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient ;
+    pointLightColor += att * (diffuse * intensity + ambient);
     // compute Phong specular component
     reflection = normalize((2.0 * dot(lightDir, normal) * normal) - lightDir);
-    specular += att * pow(max(dot(reflection, eyeVector), 0.0), gl_FrontMaterial.shininess) *
+    specular = pow(max(dot(reflection, eyeVector), 0.0), gl_FrontMaterial.shininess) *
       gl_FrontMaterial.specular *
       gl_LightSource[lightIndex].specular;
+    pointLightColor += att * specular;
   }
+  return pointLightColor;
 }
 
 
-void spot_light(in int lightIndex, in vec3 normal) {
+vec4 spot_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
+  vec4 spotLightColor, diffuse, specular, ambient = vec4(0.0);
   float intensity, dist;
 
+  spotLightColor = vec4(0.0);
   // Compute the light direction
   lightDir = vec3(gl_LightSource[lightIndex].position - eyeSpaceVertexPos);
   /* compute the distance to the light source */
@@ -85,49 +97,49 @@ void spot_light(in int lightIndex, in vec3 normal) {
       att = spotEffect / (gl_LightSource[lightIndex].constantAttenuation +
 			  gl_LightSource[lightIndex].linearAttenuation * dist +
 			  gl_LightSource[lightIndex].quadraticAttenuation * dist * dist);
-      diffuse += att * gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse * intensity;
-      ambient += att * gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient;
+      diffuse = gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse ;
+      ambient = gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient ;
+      spotLightColor += att * (diffuse * intensity + ambient);
       // compute Phong specular component
       reflection = normalize((2.0 * dot(lightDir, normal) * normal) - lightDir);
-      specular += att * pow(max(dot(reflection, eyeVector), 0.0), gl_FrontMaterial.shininess) *
+      specular = pow(max(dot(reflection, eyeVector), 0.0), gl_FrontMaterial.shininess) *
 	gl_FrontMaterial.specular * gl_LightSource[lightIndex].specular;
+      spotLightColor += att * specular;
     }
   }
+  return spotLightColor;
 }
 
 
-void calc_lighting_color(in vec3 normal) {
+vec4 calc_lighting_color(in vec3 normal) {
+  vec4 lightingColor = vec4(0.0);
+
   for (int i = 0; i < lightsNumber; i++) {
     if (gl_LightSource[i].position.w == 0.0) {
-	directional_light(i, normal);
+      lightingColor += directional_light(i, normal);
     }
     else {
       if (gl_LightSource[i].spotCutoff <= 90.0) {
-	  spot_light(i, normal);
+	lightingColor +=spot_light(i, normal);
       }
       else {
-	  point_light(i, normal);
+	lightingColor += point_light(i, normal);
       }
     }
   }
+  return lightingColor;
 }
 
 
 void main()
 {
-  vec3 vertex_normal;
-  vec4 color;
+  vec3 n;
+  vec4 color = ambientGlobal;
 
-  diffuse = vec4(0.0);
-  ambient = vec4(0.0);
-  specular = vec4(0.0);
-  /* first transform the normal into eye space and normalize the result */
-  vertex_normal = normalize(gl_NormalMatrix * gl_Normal);
-  /* compute the vertex position  in eye space. */
-  eyeSpaceVertexPos = gl_ModelViewMatrix * gl_Vertex;
-  // Global ambient lighting is computed in any case
-  ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient + gl_FrontMaterial.emission;
-  calc_lighting_color(vertex_normal);
-  gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-  gl_Position = ftransform();
+  /* a fragment shader can't write a verying variable, hence we need
+     a new variable to store the normalized interpolated normal */
+  n = normalize(vertex_normal);
+  color += calc_lighting_color(n);
+  color.w = 1.0;
+  gl_FragColor = color;
 }

@@ -1,6 +1,5 @@
 #version 120
 
-uniform sampler2D tex;
 uniform int lightsNumber;
 
 varying vec4 ambientGlobal, eyeSpaceVertexPos;
@@ -13,7 +12,7 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
   float intensity;
 
   lightDir = normalize(gl_LightSource[lightIndex].position.xyz); // that's already in eye space
-  ambient = gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient * texture2D(tex, gl_TexCoord[0].st);
+  ambient = gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient ;
   /* The ambient term of a directional light will always be present */
   dirLightColor = ambient;
   /* compute light intensity
@@ -25,7 +24,7 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
     float NdotHV;
 
     diffuse = gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse;
-    dirLightColor += diffuse * intensity * texture2D(tex, gl_TexCoord[0].st);
+    dirLightColor += diffuse * intensity ;
     // compute Blinn-Phong specular component
     NdotHV = max(dot(normal, halfVector_n), 0.0);
     specular = pow(NdotHV, gl_FrontMaterial.shininess) *
@@ -56,8 +55,8 @@ vec4 point_light(in int lightIndex, in vec3 normal) {
     att = 1.0 / (gl_LightSource[lightIndex].constantAttenuation +
 		 gl_LightSource[lightIndex].linearAttenuation * dist +
 		 gl_LightSource[lightIndex].quadraticAttenuation * dist * dist);
-    diffuse = gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse * texture2D(tex, gl_TexCoord[0].st);
-    ambient = gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient * texture2D(tex, gl_TexCoord[0].st);
+    diffuse = gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse ;
+    ambient = gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient ;
     pointLightColor += att * (diffuse * intensity + ambient);
     // compute Blinn-Phong specular component
     halfVector = normalize(lightDir - vec3(eyeSpaceVertexPos));
@@ -92,8 +91,8 @@ vec4 spot_light(in int lightIndex, in vec3 normal) {
       att = spotEffect / (gl_LightSource[lightIndex].constantAttenuation +
 			  gl_LightSource[lightIndex].linearAttenuation * dist +
 			  gl_LightSource[lightIndex].quadraticAttenuation * dist * dist);
-      diffuse = gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse * texture2D(tex, gl_TexCoord[0].st);
-      ambient = gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient * texture2D(tex, gl_TexCoord[0].st);
+      diffuse = gl_FrontMaterial.diffuse * gl_LightSource[lightIndex].diffuse ;
+      ambient = gl_FrontMaterial.ambient * gl_LightSource[lightIndex].ambient ;
       spotLightColor += att * (diffuse * intensity + ambient);
       // compute Blinn-Phong specular component
       halfVector = normalize(lightDir - vec3(eyeSpaceVertexPos));

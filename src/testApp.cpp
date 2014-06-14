@@ -5,10 +5,11 @@ void testApp::setup()
 {
 
     ofSetLogLevel(OF_LOG_VERBOSE);
-
+    if (ofIsGLProgrammableRenderer() == false) {
+        ofDisableArbTex();
+    }
     //disable vertical Sync tooo bad with light sometimes!!!!
     ofSetVerticalSync(true);
-    ofDisableArbTex();
     ofSetFrameRate(60);
     ofBackground(10, 10, 10);
     ofEnableDepthTest();
@@ -112,12 +113,13 @@ void testApp::setup()
     blinnphong.useLight(&spotLight);
    blinnphong.useMaterial(&mat);
     blinnphong.useCamera(&cam);
-  //  tex = ofImage("earth.jpg");
-    tex.loadImage("earth.jpg");
-    blinnphong.setType(ofxShadersFX::VERTEX_SHADER);
-    blinnphong.setMethod(ofxShadersFX::Lighting::PHONG);
+    tex = ofImage("earth.jpg");
 
-   blinnphong.useTexture(&tex);
+    tex.loadImage("earth.jpg");
+    sphere.mapTexCoordsFromTexture(tex.getTextureReference());
+    //blinnphong.setType(ofxShadersFX::VERTEX_SHADER);
+   // blinnphong.setMethod(ofxShadersFX::Lighting::PHONG);
+    //blinnphong.useTexture(&tex);
    //stest.load("test");
 }
 
@@ -142,7 +144,7 @@ void testApp::draw()
   // tex.getTextureReference().bind();
    // lights_Shader();
    // mat.begin();
-sphere.mapTexCoordsFromTexture(tex.getTextureReference());
+
     sphere.draw();
 //tex.getTextureReference().unbind();
     //box.draw();
