@@ -80,7 +80,6 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
 }
 
 
-
 vec4 point_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
   vec4 pointLightColor;
@@ -112,6 +111,7 @@ vec4 point_light(in int lightIndex, in vec3 normal) {
   }
   return pointLightColor;
 }
+
 
 vec4 spot_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
@@ -175,6 +175,7 @@ vec4 calc_lighting_color(in vec3 normal) {
   return lightingColor;
 }
 
+
 void main()
 {
   vec3 n;
@@ -184,6 +185,5 @@ void main()
      a new variable to store the normalized interpolated normal */
   n = normalize(vertex_normal);
   fragColor += calc_lighting_color(n);
-  //  fragColor *= texture(tex0, varyingtexcoord);
   fragColor.w = 1.0;
 }

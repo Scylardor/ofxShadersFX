@@ -110,6 +110,9 @@ string LightingShader::getShaderName()
     {
         shaderName += "vertexShader";
     }
+    if (m_tex == NULL) {
+        shaderName += "_noTexture";
+    }
     return shaderName;
 }
 
@@ -148,7 +151,9 @@ void LightingShader::end()
         {
             m_lights[i]->disable();
         }
-        m_mat->end();
+        if (m_mat != NULL) {
+            m_mat->end();
+        }
         ofDisableLighting();
     }
     if (m_tex != NULL)
@@ -241,12 +246,14 @@ void LightingShader::removeCamera()
 void LightingShader::useTexture(ofImage * p_img)
 {
     m_tex = p_img;
+    this->reload();
 }
 
 
 void LightingShader::removeTexture()
 {
     m_tex = NULL;
+    this->reload();
 }
 
 

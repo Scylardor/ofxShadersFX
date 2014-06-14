@@ -6,6 +6,7 @@ uniform int lightsNumber;
 varying vec4 ambientGlobal, eyeSpaceVertexPos;
 varying vec3 vertex_normal;
 
+
 vec4 directional_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
   vec4 dirLightColor, diffuse, specular, ambient = vec4(0.0);;
@@ -34,6 +35,7 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
   }
   return dirLightColor;
 }
+
 
 vec4 point_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
@@ -66,6 +68,7 @@ vec4 point_light(in int lightIndex, in vec3 normal) {
   }
   return pointLightColor;
 }
+
 
 vec4 spot_light(in int lightIndex, in vec3 normal) {
   vec3 lightDir;
@@ -103,6 +106,7 @@ vec4 spot_light(in int lightIndex, in vec3 normal) {
   return spotLightColor;
 }
 
+
 vec4 calc_lighting_color(in vec3 normal) {
   vec4 lightingColor = vec4(0.0);
 
@@ -134,5 +138,4 @@ void main()
   color += calc_lighting_color(n);
   color.w = 1.0;
   gl_FragColor = color;
-  //  gl_FragColor = texture2D(mytex, gl_TexCoord[0].xy);
 }
