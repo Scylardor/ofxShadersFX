@@ -245,8 +245,15 @@ void LightingShader::removeCamera()
 
 void LightingShader::useTexture(ofImage * p_img)
 {
+    bool bNotUsingTexture = (m_tex == NULL);
+
     m_tex = p_img;
-    this->reload();
+    // For the same effect, there's a different shader whether the color
+    // has to be modulated with a texture color or not. If no texture was
+    // used before, we have to reload to load the shader that uses textures.
+    if (bNotUsingTexture) {
+        this->reload();
+    }
 }
 
 
