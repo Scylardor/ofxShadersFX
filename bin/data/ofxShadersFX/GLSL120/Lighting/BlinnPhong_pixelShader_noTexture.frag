@@ -1,6 +1,7 @@
 #version 120
 
 uniform int lightsNumber;
+uniform int lightsIDs[8];
 
 varying vec4 ambientGlobal, eyeSpaceVertexPos;
 varying vec3 vertex_normal;
@@ -106,19 +107,34 @@ vec4 spot_light(in int lightIndex, in vec3 normal) {
 }
 
 
+bool light_is_enabled(in int lightIndex) {
+  bool enabled = false;
+
+  for (int i = 0; i < lightsNumber; i++) {
+    if (lightsIDs[i] == lightIndex) {
+      enabled = true;
+      break;
+    }
+  }
+  return enabled;
+}
+
+
 vec4 calc_lighting_color(in vec3 normal) {
   vec4 lightingColor = vec4(0.0);
 
-  for (int i = 0; i < lightsNumber; i++) {
-    if (gl_LightSource[i].position.w == 0.0) {
-      lightingColor += directional_light(i, normal);
-    }
-    else {
-      if (gl_LightSource[i].spotCutoff <= 90.0) {
-	lightingColor += spot_light(i, normal);
+  for (int i = 0; i < 8; i++) {
+    if (light_is_enabled(i)) {
+      if (gl_LightSource[i].position.w == 0.0) {
+	lightingColor += directional_light(i, normal);
       }
       else {
-	lightingColor += point_light(i, normal);
+	if (gl_LightSource[i].spotCutoff <= 90.0) {
+	  lightingColor +=spot_light(i, normal);
+	}
+	else {
+	  lightingColor += point_light(i, normal);
+	}
       }
     }
   }

@@ -1,6 +1,7 @@
 #version 120
 
 uniform int lightsNumber;
+uniform int lightsIDs[8];
 
 varying vec4 ambientGlobal, diffuse, ambient, specular;
 
@@ -96,17 +97,32 @@ void spot_light(in int lightIndex, in vec3 normal) {
 }
 
 
-void calc_lighting_color(in vec3 normal) {
+bool light_is_enabled(in int lightIndex) {
+  bool enabled = false;
+
   for (int i = 0; i < lightsNumber; i++) {
-    if (gl_LightSource[i].position.w == 0.0) {
-	directional_light(i, normal);
+    if (lightsIDs[i] == lightIndex) {
+      enabled = true;
+      break;
     }
-    else {
-      if (gl_LightSource[i].spotCutoff <= 90.0) {
-	  spot_light(i, normal);
+  }
+  return enabled;
+}
+
+
+void calc_lighting_color(in vec3 normal) {
+  for (int i = 0; i < 8; i++) {
+    if (light_is_enabled(i)) {
+      if (gl_LightSource[i].position.w == 0.0) {
+	directional_light(i, normal);
       }
       else {
+	if (gl_LightSource[i].spotCutoff <= 90.0) {
+	  spot_light(i, normal);
+	}
+	else {
 	  point_light(i, normal);
+	}
       }
     }
   }
