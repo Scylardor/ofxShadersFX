@@ -46,11 +46,13 @@ public:
 
 private:
     void setupLights();
+    void setupProgrammableRendererLights();
     vector<string> generateLightPropsNames();
     void setLightPosition(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
     void setLightColors(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
     void setLightAttenuation(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
     void setLightSpotProperties(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
+    void setupFixedPipelineLights();
 
     void setupMaterial();
     void setMaterialProperties(vector<unsigned char> & buffer, const GLint * offsets);
