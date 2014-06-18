@@ -51,8 +51,6 @@ void directional_light(in int lightIndex, in vec3 normal, inout vec4 diffuse,
      */
     eyeVector = vec3(-eyeSpaceVertexPos);
     lightDir = normalize(lights.light[lightIndex].position.xyz);
-    //    lightDir = normalize(vec3(lights.light[lightIndex].position.xyz) - eyeSpaceVertexPos.xyz);
-    //    lightDir = normalize(eyeSpaceVertexPos.xyz - vec3(lights.light[lightIndex].position.xyz));
     /* The ambient term will always be present */
     ambient += material.ambient * lights.light[lightIndex].ambient;
     /* compute light intensity

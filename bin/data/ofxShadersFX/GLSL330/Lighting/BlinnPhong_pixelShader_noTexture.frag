@@ -52,7 +52,6 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
      */
     eyeVector = normalize(interp_eyePos);
     lightDir = normalize(lights.light[lightIndex].position.xyz);
-			 //    lightDir = normalize(vec3(lights.light[lightIndex].position.xyz) - eyeSpaceVertexPos.xyz);
     /* The ambient term will always be present */
     ambient = material.ambient * lights.light[lightIndex].ambient;
     outputColor += ambient;
