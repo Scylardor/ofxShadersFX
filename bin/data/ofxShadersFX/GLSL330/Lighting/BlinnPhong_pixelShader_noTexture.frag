@@ -51,7 +51,8 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
      * hence we need a new variable to normalize them
      */
     eyeVector = normalize(interp_eyePos);
-    lightDir = normalize(eyeSpaceVertexPos.xyz - vec3(lights.light[lightIndex].position.xyz));
+    lightDir = normalize(lights.light[lightIndex].position.xyz);
+			 //    lightDir = normalize(vec3(lights.light[lightIndex].position.xyz) - eyeSpaceVertexPos.xyz);
     /* The ambient term will always be present */
     ambient = material.ambient * lights.light[lightIndex].ambient;
     outputColor += ambient;
@@ -70,7 +71,7 @@ vec4 directional_light(in int lightIndex, in vec3 normal) {
        NdotHV = max(dot(normal, halfVector), 0.0);
        specular = pow(NdotHV, material.shininess) *
 		  material.specular * lights.light[lightIndex].specular;
-        outputColor += specular;
+       outputColor += specular;
     }
     outputColor.w = 1.0;
     return outputColor;

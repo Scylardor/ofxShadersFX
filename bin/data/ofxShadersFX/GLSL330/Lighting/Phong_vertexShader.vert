@@ -52,7 +52,9 @@ void directional_light(in int lightIndex, in vec3 normal, inout vec4 diffuse,
   //  vec4 diffuse, ambient, specular = vec4(0.0);
   float intensity;
 
-  lightDir = vec3(normalize(eyeSpaceVertexPos - lights.light[lightIndex].position));
+  lightDir = normalize(lights.light[lightIndex].position.xyz);
+  //  lightDir = normalize(vec3(lights.light[lightIndex].position.xyz) - eyeSpaceVertexPos.xyz);
+  //lightDir = vec3(normalize(eyeSpaceVertexPos - lights.light[lightIndex].position));
   /* The ambient term will always be present */
   ambient += material.ambient * lights.light[lightIndex].ambient;
   //outputColor = ambient;
