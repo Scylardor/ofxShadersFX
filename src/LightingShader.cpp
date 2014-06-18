@@ -269,6 +269,16 @@ void LightingShader::setupLights()
     m_shader.setUniform1i("lightsNumber", m_lights.size());
     if (ofIsGLProgrammableRenderer())
     {
+        setupProgrammableRendererLights();
+    }
+    else
+    {
+        setupFixedPipelineLights();
+    }
+}
+
+
+void LightingShader::setupProgrammableRendererLights() {
         m_normalMatrix = ofMatrix4x4::getTransposedOf(m_cam->getModelViewMatrix().getInverse());
         m_shader.setUniformMatrix4f("normalMatrix", m_normalMatrix);
 
@@ -304,7 +314,6 @@ void LightingShader::setupLights()
         const unsigned int uboSize (uniformBlockSize);
         vector<unsigned char> buffer(uboSize);
 
-        //cout << uboSize << endl;
         for (size_t i = 0; i < m_lights.size(); i++)
         {
             setLightPosition(i, buffer, offsets);
@@ -315,15 +324,6 @@ void LightingShader::setupLights()
         glBufferData(GL_UNIFORM_BUFFER, uboSize, &buffer[0], GL_DYNAMIC_DRAW);
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, lights_ubo);
         glUniformBlockBinding (m_shader.getProgram(), uniformBlockIndex, 0);
-    }
-    else
-    {
-        ofEnableLighting();
-        for (size_t i = 0; i < m_lights.size(); i++)
-        {
-            m_lights[i]->enable();
-        }
-    }
 }
 
 
@@ -360,11 +360,20 @@ vector<string> LightingShader::generateLightPropsNames()
     return names;
 }
 
+
 void LightingShader::setLightPosition(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets)
 {
     int offset = offsets[0 + lightIndex * LIGHT_PROPS_NUMBER];
     ofVec3f eyeSpaceLightPos = m_lights[lightIndex]->getGlobalPosition() * m_cam->getModelViewMatrix();
 
+    if (m_lights[lightIndex]->getIsDirectional()) {
+        ofVec4f dir;
+
+        dir = m_lights[lightIndex]->getLookAtDir();
+        dir[3] = 0.0;
+        dir = dir * m_normalMatrix;
+        eyeSpaceLightPos = dir;
+    }
     for (int i = 0; i < 3; ++i)
     {
         *(reinterpret_cast<float*> (&buffer[0] + offset)) = eyeSpaceLightPos[i];
@@ -380,6 +389,7 @@ void LightingShader::setLightPosition(size_t lightIndex, vector<unsigned char> &
     }
 
 }
+
 
 void LightingShader::setLightColors(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets)
 {
@@ -411,6 +421,7 @@ void LightingShader::setLightColors(size_t lightIndex, vector<unsigned char> & b
     *(reinterpret_cast<float*> (&buffer[0] + offset)) = 1.0; // 100% alpha
 }
 
+
 void LightingShader::setLightAttenuation(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets)
 {
     int offset;
@@ -434,11 +445,15 @@ void LightingShader::setLightSpotProperties(size_t lightIndex, vector<unsigned c
     // it that's a spotlight : compute the 'real' spot direction
     if (m_lights[lightIndex]->getIsSpotlight())
     {
-        spotDir = ofVec4f(0., 0., -1., 1.) * m_normalMatrix;
+        ofVec4f dir;
+
+        dir = m_lights[lightIndex]->getLookAtDir();
+        dir[3] = 1.0;
+        spotDir = dir * m_normalMatrix;
     }
     else
     {
-        spotDir = ofVec4f(0., 0., -1., 1.); // a default spot direction (it's useful to compute it only for spotlight)
+        spotDir = ofVec4f(0., 0., -1., 1.) * m_normalMatrix; // a default spot direction (it's useful to compute it only for spotlight)
     }
     // Light spot direction (vec3)
     offset = offsets[7 + lightIndex * LIGHT_PROPS_NUMBER];
@@ -468,8 +483,25 @@ void LightingShader::setLightSpotProperties(size_t lightIndex, vector<unsigned c
     {
         *(reinterpret_cast<float*> (&buffer[0] + offset)) = m_lights[lightIndex]->getSpotConcentration();
     }
-
 }
+
+
+void LightingShader::setupFixedPipelineLights() {
+    vector<int> lightIDs(MAX_LIGHTS, -1);
+
+    ofEnableLighting();
+    for (size_t i = 0; i < m_lights.size(); i++)
+    {
+        m_lights[i]->enable();
+        // The order in which lights have been declared to OpenGL isn't necessarily the
+        // same as the one in which lights have been added to the shader. Thus, we have
+        // to pass the shader's lights IDs to the shader for it to know which light should
+        // it use.
+        lightIDs[i] = m_lights[i]->getLightID();
+    }
+    m_shader.setUniform1iv("lightsIDs", &lightIDs[0], MAX_LIGHTS);
+}
+
 
 void LightingShader::setupMaterial()
 {
