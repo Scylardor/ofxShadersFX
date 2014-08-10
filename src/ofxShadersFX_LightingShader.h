@@ -23,7 +23,6 @@ public:
     void begin();
     void end();
 
-    string getShaderName();
     LightingMethod method();
     ofCamera * camera();
     const vector<ofLight *> & lights();
@@ -43,7 +42,6 @@ public:
     void removeTexture();
     void removeCamera();
 
-
 private:
     void setupLights();
     void setupProgrammableRendererLights();
@@ -57,12 +55,20 @@ private:
     void setupMaterial();
     void setMaterialProperties(vector<unsigned char> & buffer, const GLint * offsets);
 
+    string getShader(GLenum shaderType);
+
     // Maximum number of lights
     // 8 is set to mimic legacy OpenGL limits, but
     // could be overridden
     static const size_t MAX_LIGHTS = 8;
     // Number of light properties in the shaders
     static const size_t LIGHT_PROPS_NUMBER = 11;
+    // Number of different shaders types implemented
+    static const size_t SHADERS_TYPES = 8;
+    static const char * VERTEX_SHADER_SOURCES_GLSL120[SHADERS_TYPES];
+    static const char * VERTEX_SHADER_SOURCES_GLSL330[SHADERS_TYPES];
+    static const char * FRAGMENT_SHADER_SOURCES_GLSL120[SHADERS_TYPES];
+    static const char * FRAGMENT_SHADER_SOURCES_GLSL330[SHADERS_TYPES];
     // The lighting method (Phong, BlinnPhong...) used by the shader
     LightingMethod m_method;
     vector<ofLight *> m_lights;

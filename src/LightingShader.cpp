@@ -4,6 +4,7 @@ namespace ofxShadersFX
 {
 namespace Lighting
 {
+
 LightingShader::LightingShader(LightingMethod p_method, ShaderType p_type,
                                ofCamera * p_cam, ofMaterial * p_material, ofImage *p_tex)
     : Shader(p_type)
@@ -80,49 +81,54 @@ void LightingShader::setType(ShaderType p_type)
     this->reload();
 }
 
+string LightingShader::getShader(GLenum p_shaderType) {
+    const char ** shaders;
+    int shaderIndex = 0;
 
-string LightingShader::getShaderName()
-{
-    string shaderName("ofxShadersFX/");
-
-    if (ofIsGLProgrammableRenderer())
-    {
-        shaderName += "GLSL330/";
+    if (p_shaderType == GL_VERTEX_SHADER) {
+        if (ofIsGLProgrammableRenderer()) {
+            shaders = LightingShader::VERTEX_SHADER_SOURCES_GLSL330;
+        }
+        else {
+            shaders = LightingShader::VERTEX_SHADER_SOURCES_GLSL120;
+        }
     }
-    else
-    {
-        shaderName += "GLSL120/";
+    else if (p_shaderType == GL_FRAGMENT_SHADER) {
+        if (ofIsGLProgrammableRenderer()) {
+            shaders = LightingShader::FRAGMENT_SHADER_SOURCES_GLSL330;
+        }
+        else {
+            shaders = LightingShader::FRAGMENT_SHADER_SOURCES_GLSL120;
+        }
     }
-    switch (m_method)
-    {
-    case PHONG:
-        shaderName += "Lighting/Phong_";
-        break;
-    case BLINNPHONG:
-        shaderName += "Lighting/BlinnPhong_";
-        break;
+    if (this->method() == PHONG) {
+        if (this->type() == PIXEL_SHADER) {
+            shaderIndex = 4;
+        }
+        else {
+            shaderIndex = 0;
+        }
     }
-    if (this->type() == PIXEL_SHADER)
-    {
-        shaderName += "pixelShader";
+    else if (this->method() == BLINNPHONG) {
+        if (this->type() == PIXEL_SHADER) {
+            shaderIndex = 6;
+        }
+        else {
+            shaderIndex = 2;
+        }
     }
-    else
-    {
-        shaderName += "vertexShader";
+    if (this->texture() != NULL) {
+        shaderIndex++;
     }
-    if (m_tex == NULL) {
-        shaderName += "_noTexture";
-    }
-    return shaderName;
+    return string(shaders[shaderIndex]);
 }
-
 
 
 void LightingShader::begin()
 {
     if (m_shader.isLoaded() == false)
     {
-        m_shader.load(getShaderName());
+        this->reload();
     }
     if (m_tex != NULL)
     {

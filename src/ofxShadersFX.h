@@ -18,7 +18,7 @@ public:
     void reload();
 
     ShaderType type() const;
-    virtual string getShaderName() = 0;
+    virtual string getShader(GLenum ShaderType) = 0;
 
     void setType(ShaderType type);
 
