@@ -23,7 +23,11 @@ namespace ofxShadersFX {
     }
 
     void Shader::reload() {
-        this->m_shader.unload();
-        this->m_shader.load(getShaderName());
+        this->m_shader.setupShaderFromSource(GL_VERTEX_SHADER, getShader(GL_VERTEX_SHADER));
+        this->m_shader.setupShaderFromSource(GL_FRAGMENT_SHADER, getShader(GL_FRAGMENT_SHADER));
+        if(ofIsGLProgrammableRenderer()) {
+            this->m_shader.bindDefaults();
+        }
+        this->m_shader.linkProgram();
     }
 }
