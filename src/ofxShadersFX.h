@@ -29,3 +29,4 @@ protected:
 }
 
 #include "ofxShadersFX_LightingShader.h"
+#include "ofxShadersFX_MappingShader.h"
