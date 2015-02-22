@@ -4,8 +4,8 @@
 
 namespace ofxShadersFX {
   typedef enum {
-    VERTEX_SHADER = 0,
-    PIXEL_SHADER
+    VERTEX_SHADER = 64,
+    PIXEL_SHADER = 128
   }	ShaderType;
 
 class Shader {

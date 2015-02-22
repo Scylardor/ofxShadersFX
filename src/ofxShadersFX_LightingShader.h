@@ -7,11 +7,24 @@ namespace ofxShadersFX
 {
 namespace Lighting
 {
-    typedef enum
-    {
-        PHONG,
-        BLINNPHONG
-    }	LightingMethod;
+    enum LightingMethod {
+        PHONG = 256,
+        BLINNPHONG = 512
+    };
+
+    enum ShaderHash {
+        VERTEX_SHADER = 1,
+        FRAGMENT_SHADER = 2,
+        GLSL_120 = 4,
+        GLSL_330 = 8,
+        TEX = 16,
+        NO_TEX = 32,
+        PHONG_GOURAUD = 256,
+        PHONG_PHONG = 512,
+        BLINN_GOURAUD = 1024,
+        BLINN_PHONG = 2048
+    };
+
 
 class LightingShader : public Shader
 {
@@ -56,6 +69,7 @@ private:
     void setMaterialProperties(vector<unsigned char> & buffer, const GLint * offsets);
 
     string getShader(GLenum shaderType);
+    unsigned int getShaderHash(GLenum p_shaderType);
 
     // Maximum number of lights
     // 8 is set to mimic legacy OpenGL limits, but

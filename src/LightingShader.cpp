@@ -81,6 +81,34 @@ void LightingShader::setType(ShaderType p_type)
     this->reload();
 }
 
+
+unsigned int LightingShader::getShaderHash(GLenum p_shaderType) {
+    unsigned int hash = 0;
+
+    if (p_shaderType == GL_VERTEX_SHADER) {
+        hash = VERTEX_SHADER;
+    }
+    else if (p_shaderType == GL_FRAGMENT_SHADER) {
+        hash = FRAGMENT_SHADER;
+    }
+    if (ofIsGLProgrammableRenderer()) {
+        hash |= GLSL_330;
+    }
+    else {
+        hash |= GLSL_120;
+    }
+    if (m_tex == NULL) {
+        hash |= NO_TEX;
+    }
+    else {
+        hash |= TEX;
+    }
+    hash |= type();
+    hash |= method();
+    return hash;
+}
+
+
 string LightingShader::getShader(GLenum p_shaderType) {
     const char ** shaders;
     int shaderIndex = 0;
