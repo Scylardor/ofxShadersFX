@@ -3,10 +3,10 @@
 #include "ofMain.h"
 
 namespace ofxShadersFX {
-  typedef enum {
+  enum ShaderType {
     VERTEX_SHADER = 64,
     PIXEL_SHADER = 128
-  }	ShaderType;
+  };
 
 class Shader {
 public:

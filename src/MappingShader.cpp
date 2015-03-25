@@ -5,12 +5,13 @@ namespace ofxShadersFX
 namespace Mapping
 {
 
-MappingShader::MappingShader()
+MappingShader::MappingShader(MappingMethod p_method)
     : Shader()
 {
     m_maps = vector<ofImage *>(MAPS_NUMBER, NULL);
     m_selfAllocated[0] = false;
     m_selfAllocated[1] = false;
+    setMethod(p_method);
 }
 
 MappingShader::~MappingShader()
@@ -36,7 +37,7 @@ void MappingShader::begin()
             stringstream number("");
 
             number << i;
-            m_shader.setUniformTexture(string("tex") + number.str(), (*m_maps[i]), i);
+            m_shader.setUniformTexture(string("tex") + number.str(), (*m_maps[i]), i+1);
             m_maps[i]->bind();
         }
     }
@@ -89,7 +90,10 @@ string MappingShader::getShader(GLenum p_shaderType)
             shaders = MappingShader::FRAGMENT_SHADER_SOURCES_GLSL120;
         }
     }
+    shaderIndex = static_cast<int>(method());
+    ofLogWarning() << "Getting shader index " << shaderIndex << endl;
     shader = string(shaders[shaderIndex]);
+    ofLogWarning() << "Getting shader " << shader << endl;
     return shader;
 }
 
@@ -183,41 +187,6 @@ void MappingShader::clearMap(unsigned int p_index)
         ofLogError() << "Map index out of range" << endl;
     }
 }
-
-void MappingShader::setParameter(const string & p_name, float p_value)
-{
-    m_params[p_name] = p_value;
-}
-
-void MappingShader::clearParameter(const string & p_name)
-{
-    m_params.erase(p_name);
-}
-
-
-void MappingShader::clearParameters()
-{
-    m_params.clear();
-}
-
-
-const map<string, float> & MappingShader::parameters()
-{
-    return m_params;
-}
-
-
-const vector<ofImage *> & MappingShader::maps()
-{
-    return m_maps;
-}
-
-
-MappingMethod MappingShader::method()
-{
-    return m_method;
-}
-
 
 }
 }

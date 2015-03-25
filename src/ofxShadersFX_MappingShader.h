@@ -7,24 +7,22 @@ namespace ofxShadersFX
 {
 namespace Mapping
 {
-typedef enum
-{
-    BUMP = 0,
-    DISPLACEMENT,
-    ALPHA_BLENDING,
+enum MappingMethod {
+    DISPLACEMENT = 0,
+    ALPHA_BLENDING = 1,
     NORMAL,
     COLOR_KEY
-}   MappingMethod;
+};
 
-typedef enum {
+enum MapType {
     PRIMARY = 0,
     SECONDARY
-}   MapType;
+};
 
 class MappingShader : public Shader
 {
 public:
-    MappingShader();
+    MappingShader(MappingMethod p_method=DISPLACEMENT);
     ~MappingShader();
 
     void begin();
@@ -39,20 +37,21 @@ public:
     void setSecondaryMap(ofImage * map);
     void setSecondaryMap(const string & map);
     void setMaps(const vector<ofImage *> & maps);
-    void setParameter(const string & name, float value);
-    void clearParameter(const string & name);
-    void clearParameters();
+    inline void setParameter(const string & p_name, float p_value) { m_params[p_name] = p_value; }
+    inline void clearParameter(const string & p_name) { m_params.erase(p_name); }
+    inline void clearParameters() { m_params.clear(); }
+    inline void setMethod(MappingMethod p_method) { m_method = p_method; this->reload(); }
 
-    const vector<ofImage *> & maps();
-    const map<string, float> & parameters();
-    MappingMethod method();
+    inline const vector<ofImage *> & maps() const { return m_maps; }
+    inline const map<string, float> & parameters() const { return m_params; }
+    inline MappingMethod method() const { return m_method; }
 
 protected:
     void clearMap(unsigned int index);
 
     // Number of maps supported by the mapping shader.
     static const unsigned int MAPS_NUMBER = 2;
-    static const size_t SHADERS_TYPES = 1;
+    static const size_t SHADERS_TYPES = 2;
     static const char * VERTEX_SHADER_SOURCES_GLSL120[SHADERS_TYPES];
     static const char * FRAGMENT_SHADER_SOURCES_GLSL120[SHADERS_TYPES];
     static const char * VERTEX_SHADER_SOURCES_GLSL330[SHADERS_TYPES];
