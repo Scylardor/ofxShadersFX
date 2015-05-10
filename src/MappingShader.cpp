@@ -8,7 +8,7 @@ namespace Mapping
 MappingShader::MappingShader(MappingMethod p_method)
     : Shader()
 {
-    m_maps = vector<ofImage *>(MAPS_NUMBER, NULL);
+    m_imgs = vector<ofImage *>(MAPS_NUMBER, NULL);
     m_selfAllocated[0] = false;
     m_selfAllocated[1] = false;
     setMethod(p_method);
@@ -30,15 +30,15 @@ void MappingShader::begin()
         this->reload();
     }
     Shader::begin();
-    for (unsigned int i = 0; i < m_maps.size(); ++i)
+    for (unsigned int i = 0; i < m_imgs.size(); ++i)
     {
-        if (m_maps[i] != NULL)
+        if (m_imgs[i] != NULL)
         {
             stringstream number("");
 
             number << i;
-            m_shader.setUniformTexture(string("tex") + number.str(), (*m_maps[i]), i+1);
-            m_maps[i]->bind();
+            m_shader.setUniformTexture(string("tex") + number.str(), (*m_imgs[i]), i+1);
+            m_imgs[i]->bind();
         }
     }
     for (map<string, float>::iterator param = m_params.begin(); param != m_params.end(); ++param)
@@ -52,11 +52,11 @@ void MappingShader::begin()
 void MappingShader::end()
 {
     Shader::end();
-    for (unsigned int i = 0; i < m_maps.size(); ++i)
+    for (unsigned int i = 0; i < m_imgs.size(); ++i)
     {
-        if (m_maps[i] != NULL)
+        if (m_imgs[i] != NULL)
         {
-            m_maps[i]->unbind();
+            m_imgs[i]->unbind();
         }
     }
 }
@@ -103,9 +103,9 @@ void MappingShader::addMap(ofImage * p_map)
 {
     unsigned int limit = MAPS_NUMBER;
 
-    if (m_maps.size() < limit)
+    if (m_imgs.size() < limit)
     {
-        m_maps.push_back(p_map);
+        m_imgs.push_back(p_map);
     }
     else
     {
@@ -119,7 +119,7 @@ void MappingShader::setMap(MapType p_type, ofImage * p_map)
     if (p_type < MAPS_NUMBER)
     {
         clearMap(p_type);
-        m_maps[p_type] = p_map;
+        m_imgs[p_type] = p_map;
     }
     else
     {
@@ -162,7 +162,7 @@ void MappingShader::setMaps(const vector<ofImage *> & p_maps)
 
     if (p_maps.size() <= limit)
     {
-        m_maps = p_maps;
+        m_imgs = p_maps;
     }
     else
     {
@@ -177,10 +177,10 @@ void MappingShader::clearMap(unsigned int p_index)
     {
         if (m_selfAllocated[p_index] == true)
         {
-            delete m_maps[p_index];
+            delete m_imgs[p_index];
         }
         m_selfAllocated[p_index] = false;
-        m_maps[p_index] = NULL;
+        m_imgs[p_index] = NULL;
     }
     else
     {

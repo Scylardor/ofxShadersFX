@@ -42,7 +42,7 @@ public:
     inline void clearParameters() { m_params.clear(); }
     inline void setMethod(MappingMethod p_method) { m_method = p_method; this->reload(); }
 
-    inline const vector<ofImage *> & maps() const { return m_maps; }
+    inline const vector<ofImage *> & images() const { return m_imgs; }
     inline const map<string, float> & parameters() const { return m_params; }
     inline MappingMethod method() const { return m_method; }
 
@@ -56,7 +56,7 @@ protected:
     static const char * FRAGMENT_SHADER_SOURCES_GLSL120[SHADERS_TYPES];
     static const char * VERTEX_SHADER_SOURCES_GLSL330[SHADERS_TYPES];
     static const char * FRAGMENT_SHADER_SOURCES_GLSL330[SHADERS_TYPES];
-    vector<ofImage *> m_maps;
+    vector<ofImage *> m_imgs;
     // To track if stored ofImages have been allocated by addon or user
     // (we must not delete user-allocated images)
     bool m_selfAllocated[2];
