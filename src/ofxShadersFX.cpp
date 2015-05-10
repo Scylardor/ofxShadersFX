@@ -1,7 +1,7 @@
 #include "ofxShadersFX.h"
 
 namespace ofxShadersFX {
-    Shader::Shader(ShaderType p_type)
+    Shader::Shader(Type p_type)
     {
         setType(p_type);
     }

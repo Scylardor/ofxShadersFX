@@ -10,22 +10,29 @@ namespace ofxShadersFX {
 
 class Shader {
 public:
-    Shader(ShaderType type=PIXEL_SHADER);
+    // Available shader "types"
+    enum Type {
+        LIGHTING = 0,
+        MAPPING
+    };
+
+    Shader(Type type);
     virtual ~Shader() {}
 
     void begin();
     void end();
     void reload();
 
-    ShaderType type() const;
+    Type type() const;
     virtual string getShader(GLenum ShaderType) = 0;
 
-    void setType(ShaderType type);
+    void setType(Type type);
 
 protected:
-    ShaderType m_type;
+    Type m_type;
     ofShader m_shader;
 };
+
 }
 
 #include "ofxShadersFX_LightingShader.h"

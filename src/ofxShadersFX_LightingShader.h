@@ -7,29 +7,45 @@ namespace ofxShadersFX
 {
 namespace Lighting
 {
+    // Gouraud shading = vertex shading ; Phong = pixel shading.
+    // Phong shading is used by default since it's prettier
+    enum ShadingMethod {
+        GOURAUD_SHADING = 0,
+        PHONG_SHADING
+    };
+
     enum LightingMethod {
         PHONG = 256,
         BLINNPHONG = 512
     };
 
+    // Using powers of 2 guarantees there can be only one possible mix of each descriptor using binary |'s
+    // This is used to retrieve a given preset minified shader source (cf. LightingShader_sources.cpp).
+    // e.g.: vertex shader in GLSL120 without texture rendering using Phong lighting with Gouraud shading,
+    // or pixel shader in GLSL330 with texture rendering using Blinn-Phong lighting with Phong shading.
     enum ShaderHash {
-        VERTEX_SHADER = 1,
-        FRAGMENT_SHADER = 2,
-        GLSL_120 = 4,
-        GLSL_330 = 8,
-        TEX = 16,
-        NO_TEX = 32,
-        PHONG_GOURAUD = 256,
-        PHONG_PHONG = 512,
-        BLINN_GOURAUD = 1024,
-        BLINN_PHONG = 2048
+        VERTEX_SHADER =     1 << 0,
+        FRAGMENT_SHADER =   1 << 1,
+
+        GLSL_120 =          1 << 2,
+        GLSL_330 =          1 << 3,
+
+        TEX =               1 << 4,
+        NO_TEX =            1 << 5,
+
+        PHONG_GOURAUD =     1 << 6,
+        PHONG_PHONG =       1 << 7,
+
+        BLINN_GOURAUD =     1 << 8,
+        BLINN_PHONG =       1 << 9
     };
 
 
 class LightingShader : public Shader
 {
 public:
-    LightingShader(LightingMethod method=BLINNPHONG, ShaderType type=PIXEL_SHADER,
+    LightingShader();
+    LightingShader(LightingMethod method, Shader::Type type,
                    ofCamera * cam=NULL, ofMaterial * material=NULL, ofImage * image=NULL);
     ~LightingShader();
 

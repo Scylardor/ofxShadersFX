@@ -5,8 +5,13 @@ namespace ofxShadersFX
 namespace Lighting
 {
 
-LightingShader::LightingShader(LightingMethod p_method, ShaderType p_type,
-                               ofCamera * p_cam, ofMaterial * p_material, ofImage *p_tex)
+LightingShader::LightingShader() {
+    // Use Phong-shaded Blinn-Phong lighting by default.
+    set
+}
+
+LightingShader::LightingShader(LightingMethod p_method, Shader::Type p_type,
+                               ofCamera * p_cam, ofMaterial * p_material, ofImage * p_tex)
     : Shader(p_type)
 {
     m_cam = p_cam;
