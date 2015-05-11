@@ -6,7 +6,7 @@ namespace Mapping
 {
 
 MappingShader::MappingShader(MappingMethod p_method)
-    : Shader()
+    : Shader(MAPPING)
 {
     m_imgs = vector<ofImage *>(MAPS_NUMBER, NULL);
     m_selfAllocated[0] = false;
