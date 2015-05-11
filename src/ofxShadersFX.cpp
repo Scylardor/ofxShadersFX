@@ -1,9 +1,9 @@
 #include "ofxShadersFX.h"
 
 namespace ofxShadersFX {
-    Shader::Shader(Type p_type)
+    Shader::Shader(ShaderType p_type)
     {
-        setType(p_type);
+        setShaderType(p_type);
     }
 
     void Shader::begin() {
@@ -14,11 +14,11 @@ namespace ofxShadersFX {
         m_shader.end();
     }
 
-    ShaderType Shader::type() const {
+    ShaderType Shader::shaderType() const {
         return m_type;
     }
 
-    void Shader::setType(ShaderType p_type) {
+    void Shader::setShaderType(ShaderType p_type) {
         m_type = p_type;
     }
 

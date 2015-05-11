@@ -3,33 +3,28 @@
 #include "ofMain.h"
 
 namespace ofxShadersFX {
-  enum ShaderType {
-    VERTEX_SHADER = 64,
-    PIXEL_SHADER = 128
-  };
-
-class Shader {
-public:
     // Available shader "types"
-    enum Type {
+    enum ShaderType {
         LIGHTING = 0,
         MAPPING
     };
 
-    Shader(Type type);
+class Shader {
+public:
+    Shader(ShaderType type);
     virtual ~Shader() {}
 
     void begin();
     void end();
     void reload();
 
-    Type type() const;
+    ShaderType shaderType() const;
     virtual string getShader(GLenum ShaderType) = 0;
 
-    void setType(Type type);
+    void setShaderType(ShaderType type);
 
 protected:
-    Type m_type;
+    ShaderType m_type;
     ofShader m_shader;
 };
 
