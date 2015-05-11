@@ -5,31 +5,81 @@ namespace ofxShadersFX
 namespace Lighting
 {
 
-LightingShader::LightingShader() {
+LightingShader::LightingShader()
+: Shader(LIGHTING)
+{
     // Use Phong-shaded Blinn-Phong lighting by default.
-    set
+    setShadingMethod(PIXEL_SHADING);
+    setLightingMethod(BLINN_PHONG_LIGHTING);
 }
 
-LightingShader::LightingShader(LightingMethod p_method, Shader::Type p_type,
+
+LightingShader::LightingShader(ShadingMethod p_shadingMethod, LightingMethod p_lightMethod,
                                ofCamera * p_cam, ofMaterial * p_material, ofImage * p_tex)
-    : Shader(p_type)
+: Shader(LIGHTING)
 {
     m_cam = p_cam;
     m_mat = p_material;
     m_tex = p_tex;
-    setMethod(p_method);
-    m_defaultMat = new ofMaterial();
+    setShadingMethod(p_shadingMethod);
+    setLightingMethod(p_lightMethod);
 }
+
 
 LightingShader::~LightingShader()
 {
-    delete m_defaultMat;
-
 }
 
-LightingMethod LightingShader::method()
+
+ShadingMethod LightingShader::shadingMethod() const
 {
-    return m_method;
+    return m_shadingMethod;
+}
+
+
+LightingMethod LightingShader::lightingMethod() const
+{
+    return m_lightingMethod;
+}
+
+
+const ofCamera * LightingShader::camera() const
+{
+    return m_cam;
+}
+
+
+const vector<ofLight *> & LightingShader::lights() const
+{
+    return m_lights;
+}
+
+
+const ofLight * LightingShader::light(size_t p_index) const
+{
+    ofLight * ret = NULL;
+
+    if (p_index < m_lights.size())
+    {
+        ret = m_lights[p_index];
+    }
+    else
+    {
+        ofLogError() << "ofxShadersFX::LightingShader: No light at index " << p_index << endl;
+    }
+    return ret;
+}
+
+
+const ofMaterial * LightingShader::material() const
+{
+    return m_mat;
+}
+
+
+const ofImage * LightingShader::texture() const
+{
+    return m_tex;
 }
 
 
@@ -39,7 +89,7 @@ ofCamera * LightingShader::camera()
 }
 
 
-const vector<ofLight *> & LightingShader::lights()
+vector<ofLight *> & LightingShader::lights()
 {
     return m_lights;
 }
@@ -47,7 +97,7 @@ const vector<ofLight *> & LightingShader::lights()
 
 ofLight * LightingShader::light(size_t p_index)
 {
-    ofLight *ret = NULL;
+    ofLight * ret = NULL;
 
     if (p_index < m_lights.size())
     {
@@ -73,51 +123,23 @@ ofImage * LightingShader::texture()
 }
 
 
-void LightingShader::setMethod(LightingMethod p_method)
+void LightingShader::setLightingMethod(LightingMethod p_method)
 {
-    m_method = p_method;
+    m_lightingMethod = p_method;
     this->reload();
 }
 
 
-void LightingShader::setType(ShaderType p_type)
+void LightingShader::setShadingMethod(ShadingMethod p_method)
 {
-    Shader::setType(p_type);
+    m_shadingMethod = p_method;
     this->reload();
-}
-
-
-unsigned int LightingShader::getShaderHash(GLenum p_shaderType) {
-    unsigned int hash = 0;
-
-    if (p_shaderType == GL_VERTEX_SHADER) {
-        hash = VERTEX_SHADER;
-    }
-    else if (p_shaderType == GL_FRAGMENT_SHADER) {
-        hash = FRAGMENT_SHADER;
-    }
-    if (ofIsGLProgrammableRenderer()) {
-        hash |= GLSL_330;
-    }
-    else {
-        hash |= GLSL_120;
-    }
-    if (m_tex == NULL) {
-        hash |= NO_TEX;
-    }
-    else {
-        hash |= TEX;
-    }
-    hash |= type();
-    hash |= method();
-    return hash;
 }
 
 
 string LightingShader::getShader(GLenum p_shaderType) {
     const char ** shaders;
-    int shaderIndex = 0;
-
+    // First get the correct shader source array.
     if (p_shaderType == GL_VERTEX_SHADER) {
         if (ofIsGLProgrammableRenderer()) {
             shaders = LightingShader::VERTEX_SHADER_SOURCES_GLSL330;
@@ -134,22 +156,28 @@ string LightingShader::getShader(GLenum p_shaderType) {
             shaders = LightingShader::FRAGMENT_SHADER_SOURCES_GLSL120;
         }
     }
-    if (this->method() == PHONG) {
-        if (this->type() == PIXEL_SHADER) {
-            shaderIndex = 4;
+
+    // Then find the good index for the shader matching our parameters.
+    ShaderSourceIndex sourceIndex;
+    if (this->lightingMethod() == PHONG_LIGHTING) {
+        if (this->shadingMethod() == PIXEL_SHADING) {
+            sourceIndex = PIXEL_PHONG;
         }
         else {
-            shaderIndex = 0;
+            sourceIndex = VERTEX_PHONG;
         }
     }
-    else if (this->method() == BLINNPHONG) {
-        if (this->type() == PIXEL_SHADER) {
-            shaderIndex = 6;
+    else if (this->lightingMethod() == BLINN_PHONG_LIGHTING) {
+        if (this->shadingMethod() == PIXEL_SHADING) {
+            sourceIndex = PIXEL_BLINN_PHONG;
         }
         else {
-            shaderIndex = 2;
+            sourceIndex = VERTEX_BLINN_PHONG;
         }
     }
+
+    // Casting to int is necessary to increment.
+    int shaderIndex = static_cast<int>(sourceIndex);
     if (this->texture() != NULL) {
         shaderIndex++;
     }
@@ -547,7 +575,7 @@ void LightingShader::setupMaterial()
     // if no material provided, use the default one
     if (m_mat == NULL)
     {
-        m_mat = m_defaultMat;
+        m_mat = &m_defaultMat;
     }
     if (ofIsGLProgrammableRenderer())
     {
