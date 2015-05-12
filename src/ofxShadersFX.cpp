@@ -7,6 +7,12 @@ namespace ofxShadersFX {
     }
 
     void Shader::begin() {
+        // The shader needs reload if not loaded
+        // or if modifications in attributes occurred since last frame
+        if (!m_shader.isLoaded() || m_needsReload) {
+            reload();
+            m_needsReload = false;
+        }
         m_shader.begin();
     }
 

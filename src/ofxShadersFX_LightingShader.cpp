@@ -126,14 +126,14 @@ ofImage * LightingShader::texture()
 void LightingShader::setLightingMethod(LightingMethod p_method)
 {
     m_lightingMethod = p_method;
-    this->reload();
+    m_needsReload = true;
 }
 
 
 void LightingShader::setShadingMethod(ShadingMethod p_method)
 {
     m_shadingMethod = p_method;
-    this->reload();
+    m_needsReload = true;
 }
 
 
@@ -187,16 +187,13 @@ string LightingShader::getShader(GLenum p_shaderType) {
 
 void LightingShader::begin()
 {
-    if (m_shader.isLoaded() == false)
-    {
-        this->reload();
-    }
+    Shader::begin();
     if (m_tex != NULL)
     {
         m_shader.setUniformTexture("tex", (*m_tex), 1);
         m_tex->bind();
     }
-    Shader::begin();
+
     // The camera is only necessary in programmable pipeline mode
     if (m_cam != NULL || ofIsGLProgrammableRenderer() == false)
     {
@@ -231,7 +228,7 @@ void LightingShader::end()
 
 void LightingShader::useLight(ofLight * p_light)
 {
-    size_t limit = this->MAX_LIGHTS;
+    const size_t limit = this->MAX_LIGHTS;
 
     if (m_lights.size() < limit)
     {
@@ -245,7 +242,7 @@ void LightingShader::useLight(ofLight * p_light)
 
 void LightingShader::useLights(const vector<ofLight*> & p_lights, bool p_replace)
 {
-    size_t limit = this->MAX_LIGHTS;
+    const size_t limit = this->MAX_LIGHTS;
 
     if (p_replace)
     {
@@ -312,14 +309,13 @@ void LightingShader::removeCamera()
 
 void LightingShader::useTexture(ofImage * p_img)
 {
-    bool bNotUsingTexture = (m_tex == NULL);
+    const bool bNotUsingTexture = (m_tex == NULL);
 
     m_tex = p_img;
-    // For the same effect, there's a different shader whether the color
-    // has to be modulated with a texture color or not. If no texture was
-    // used before, we have to reload to load the shader that uses textures.
+    // If now using a texture whereas we didn't use one before, we're going to need another version
+    // of the current shader blending in the texture color, so ask a reload.
     if (bNotUsingTexture) {
-        this->reload();
+        m_needsReload = true;
     }
 }
 
@@ -327,7 +323,7 @@ void LightingShader::useTexture(ofImage * p_img)
 void LightingShader::removeTexture()
 {
     m_tex = NULL;
-    this->reload();
+    m_needsReload = true;
 }
 
 

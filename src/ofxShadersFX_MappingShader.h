@@ -40,7 +40,7 @@ public:
     inline void setParameter(const string & p_name, float p_value) { m_params[p_name] = p_value; }
     inline void clearParameter(const string & p_name) { m_params.erase(p_name); }
     inline void clearParameters() { m_params.clear(); }
-    inline void setMethod(MappingMethod p_method) { m_method = p_method; this->reload(); }
+    inline void setMethod(MappingMethod p_method) { m_method = p_method; m_needsReload = true; }
 
     inline const vector<ofImage *> & images() const { return m_imgs; }
     inline const map<string, float> & parameters() const { return m_params; }

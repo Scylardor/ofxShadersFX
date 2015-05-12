@@ -25,10 +25,6 @@ MappingShader::~MappingShader()
 
 void MappingShader::begin()
 {
-    if (m_shader.isLoaded() == false)
-    {
-        this->reload();
-    }
     Shader::begin();
     for (unsigned int i = 0; i < m_imgs.size(); ++i)
     {
