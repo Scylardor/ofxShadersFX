@@ -137,7 +137,7 @@ void LightingShader::setShadingMethod(ShadingMethod p_method)
 }
 
 
-string LightingShader::getShader(GLenum p_shaderType) {
+string LightingShader::getShader(GLenum p_shaderType) const {
     const char ** shaders;
     // First get the correct shader source array.
     if (p_shaderType == GL_VERTEX_SHADER) {

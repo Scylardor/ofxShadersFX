@@ -6,183 +6,129 @@ namespace Mapping
 {
 
 MappingShader::MappingShader(MappingMethod p_method)
-    : Shader(MAPPING)
-{
-    m_imgs = vector<ofImage *>(MAPS_NUMBER, NULL);
-    m_selfAllocated[0] = false;
-    m_selfAllocated[1] = false;
-    setMethod(p_method);
-}
-
-MappingShader::~MappingShader()
-{
-    for (unsigned int i = 0; i < MAPS_NUMBER; ++i)
-    {
-        clearMap(i);
-    }
+: Shader(MAPPING) {
 }
 
 
-void MappingShader::begin()
-{
+MappingShader::~MappingShader() {
+    freeAllocatedImages();
+}
+
+
+void MappingShader::begin() {
     Shader::begin();
-    for (unsigned int i = 0; i < m_imgs.size(); ++i)
-    {
-        if (m_imgs[i] != NULL)
-        {
+    for (unsigned int i = 0; i < m_imgs.size(); ++i) {
+        if (m_imgs[i] != NULL) {
             stringstream number("");
-
             number << i;
-            m_shader.setUniformTexture(string("tex") + number.str(), (*m_imgs[i]), i+1);
+
+            m_shader.setUniformTexture(string("tex") + number.str(), (*m_imgs[i]), i + 1);
             m_imgs[i]->bind();
         }
     }
-    for (map<string, float>::iterator param = m_params.begin(); param != m_params.end(); ++param)
-    {
-        m_shader.setUniform1f(param->first, param->second);
-    }
-
 }
 
 
-void MappingShader::end()
-{
+void MappingShader::end() {
     Shader::end();
-    for (unsigned int i = 0; i < m_imgs.size(); ++i)
-    {
-        if (m_imgs[i] != NULL)
-        {
+    for (unsigned int i = 0; i < m_imgs.size(); ++i) {
+        if (m_imgs[i] != NULL) {
             m_imgs[i]->unbind();
         }
     }
 }
 
 
-string MappingShader::getShader(GLenum p_shaderType)
-{
-    const char ** shaders;
-    string shader;
-    int shaderIndex = 0;
+string MappingShader::getShader(GLenum p_enum) const {
+    const char ** shaderSources;
 
-    if (p_shaderType == GL_VERTEX_SHADER)
-    {
-        if (ofIsGLProgrammableRenderer())
-        {
-            shaders = MappingShader::VERTEX_SHADER_SOURCES_GLSL330;
+    if (ofIsGLProgrammableRenderer()) { // OpenGL 3.3
+        if (p_enum == GL_VERTEX_SHADER) {
+            shaderSources = VERTEX_SHADER_SOURCES_GLSL330;
+        } else {
+            shaderSources = FRAGMENT_SHADER_SOURCES_GLSL330;
         }
-        else
-        {
-            shaders = MappingShader::VERTEX_SHADER_SOURCES_GLSL120;
-        }
-    }
-    else if (p_shaderType == GL_FRAGMENT_SHADER)
-    {
-        if (ofIsGLProgrammableRenderer())
-        {
-            shaders = MappingShader::FRAGMENT_SHADER_SOURCES_GLSL330;
-        }
-        else
-        {
-            shaders = MappingShader::FRAGMENT_SHADER_SOURCES_GLSL120;
+    } else { // OpenGL 1.2
+        if (p_enum == GL_VERTEX_SHADER) {
+            shaderSources = VERTEX_SHADER_SOURCES_GLSL120;
+        } else {
+            shaderSources = FRAGMENT_SHADER_SOURCES_GLSL120;
         }
     }
-    shaderIndex = static_cast<int>(method());
-    ofLogWarning() << "Getting shader index " << shaderIndex << endl;
-    shader = string(shaders[shaderIndex]);
-    ofLogWarning() << "Getting shader " << shader << endl;
-    return shader;
+    const int shaderIndex = static_cast<int>(m_method);
+    return shaderSources[shaderIndex];
 }
 
 
+void MappingShader::freeAllocatedImages() {
+    // Free the images that have been allocated by the shader
+    // e.g. when user passed a path instead of an ofImage
+    for (unsigned int i = 0; i < m_indicesToDelete.size(); ++i) {
+        const int imgIdxToDelete = m_indicesToDelete[i];
 
-void MappingShader::addMap(ofImage * p_map)
-{
-    unsigned int limit = MAPS_NUMBER;
-
-    if (m_imgs.size() < limit)
-    {
-        m_imgs.push_back(p_map);
-    }
-    else
-    {
-        ofLogError() << "You cannot use more than " << limit << " maps" << endl;
+        delete m_imgs[imgIdxToDelete];
     }
 }
 
 
-void MappingShader::setMap(MapType p_type, ofImage * p_map)
-{
-    if (p_type < MAPS_NUMBER)
-    {
-        clearMap(p_type);
-        m_imgs[p_type] = p_map;
-    }
-    else
-    {
-        ofLogError() << "Unknown map type" << endl;
+void MappingShader::rearrangeLists(ofImage * p_img, int p_index) {
+    m_imgs.insert(m_imgs.begin() + p_index, p_img);
+    // Update the "indices to delete" array if image at target index was allocated
+    vector<int>::iterator idxToDelete = find(m_indicesToDelete.begin(), m_indicesToDelete.end(), p_index);
+    if (idxToDelete != m_indicesToDelete.end()) {
+        (*idxToDelete)++; // The allocated image index is now shifted by 1
     }
 }
 
 
-void MappingShader::setMap(MapType p_type, const string & p_map_path)
-{
-    setMap(p_type, new ofImage(p_map_path));
-    m_selfAllocated[p_type] = true;
+void MappingShader::addImage(ofImage * p_img, int p_index) {
+    rearrangeLists(p_img, p_index);
 }
 
 
-void MappingShader::setPrimaryMap(ofImage * p_map)
-{
-    setMap(PRIMARY, p_map);
-}
+void MappingShader::addImage(const string & p_imgPath, int p_index) {
+    ofImage * newImage = new ofImage(p_imgPath);
 
-void MappingShader::setPrimaryMap(const string & p_map)
-{
-    setMap(PRIMARY, p_map);
-}
-
-void MappingShader::setSecondaryMap(ofImage * p_map)
-{
-    setMap(SECONDARY, p_map);
-}
-
-void MappingShader::setSecondaryMap(const string & p_map)
-{
-    setMap(SECONDARY, p_map);
-}
-
-
-void MappingShader::setMaps(const vector<ofImage *> & p_maps)
-{
-    unsigned int limit = MAPS_NUMBER;
-
-    if (p_maps.size() <= limit)
-    {
-        m_imgs = p_maps;
-    }
-    else
-    {
-        ofLogError() << "You cannot use more than " << limit << " maps" << endl;
+    rearrangeLists(newImage, p_index);
+    if (p_index != -1) {
+        m_indicesToDelete.push_back(p_index);
+    } else {
+        m_indicesToDelete.push_back(m_imgs.size() - 1);
     }
 }
 
 
-void MappingShader::clearMap(unsigned int p_index)
-{
-    if (p_index < MAPS_NUMBER)
-    {
-        if (m_selfAllocated[p_index] == true)
-        {
-            delete m_imgs[p_index];
-        }
-        m_selfAllocated[p_index] = false;
-        m_imgs[p_index] = NULL;
+void MappingShader::setImage(ofImage * p_img, int p_index) {
+    // Delete the image at target index if it was allocated.
+    vector<int>::iterator idxToDelete = find(m_indicesToDelete.begin(), m_indicesToDelete.end(), p_index);
+
+    if (idxToDelete != m_indicesToDelete.end()) {
+        delete m_imgs[(*idxToDelete)];
+        m_indicesToDelete.erase(idxToDelete); // image at this index is no longer allocated
     }
-    else
-    {
-        ofLogError() << "Map index out of range" << endl;
-    }
+
+    m_imgs[p_index] = p_img;
 }
 
+
+void MappingShader::setImage(const string & p_imgPath, int p_index) {
+    ofImage * newImage = new ofImage(p_imgPath);
+    // Delete the image at target index if it was allocated.
+    vector<int>::iterator idxToDelete = find(m_indicesToDelete.begin(), m_indicesToDelete.end(), p_index);
+
+    if (idxToDelete != m_indicesToDelete.end()) {
+        // Delete the old image and that's all: both old and new images are allocated, so no need to change the index
+        delete m_imgs[(*idxToDelete)];
+    }
+
+    m_imgs[p_index] = newImage;
 }
+
+
+void MappingShader::setImages(const vector<ofImage *> & p_imgs) {
+    freeAllocatedImages();
+    m_imgs = p_imgs;
 }
+
+} // namespace Mapping
+} // namespace ofxShadersFX

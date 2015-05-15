@@ -9,60 +9,66 @@ namespace Mapping
 {
 enum MappingMethod {
     DISPLACEMENT = 0,
-    ALPHA_BLENDING = 1,
+    ALPHA_BLENDING,
     NORMAL,
     COLOR_KEY
-};
-
-enum MapType {
-    PRIMARY = 0,
-    SECONDARY
 };
 
 class MappingShader : public Shader
 {
 public:
-    MappingShader(MappingMethod p_method=DISPLACEMENT);
+    MappingShader(MappingMethod p_method);
     ~MappingShader();
 
     void begin();
     void end();
-    string getShader(GLenum ShaderType);
 
-    void addMap(ofImage * map);
-    void setMap(MapType type, ofImage * map);
-    void setMap(MapType type, const string & map);
-    void setPrimaryMap(ofImage * map);
-    void setPrimaryMap(const string & map);
-    void setSecondaryMap(ofImage * map);
-    void setSecondaryMap(const string & map);
-    void setMaps(const vector<ofImage *> & maps);
-    inline void setParameter(const string & p_name, float p_value) { m_params[p_name] = p_value; }
-    inline void clearParameter(const string & p_name) { m_params.erase(p_name); }
-    inline void clearParameters() { m_params.clear(); }
-    inline void setMethod(MappingMethod p_method) { m_method = p_method; m_needsReload = true; }
+    // Accessors
 
-    inline const vector<ofImage *> & images() const { return m_imgs; }
-    inline const map<string, float> & parameters() const { return m_params; }
-    inline MappingMethod method() const { return m_method; }
+    MappingMethod method() const { return m_method; }
+    const vector<ofImage *> & maps() const { return m_imgs; }
 
 protected:
-    void clearMap(unsigned int index);
 
-    // Number of maps supported by the mapping shader.
-    static const unsigned int MAPS_NUMBER = 2;
-    static const size_t SHADERS_TYPES = 2;
+    // Accessors
+
+    virtual string getShader(GLenum p_enum) const;
+
+
+    // Mutators
+
+    void addImage(ofImage * p_img, int p_index = -1);
+    void addImage(const string & p_imgPath, int p_index = -1);
+
+    void setImage(ofImage * p_img, int p_index);
+    void setImage(const string & p_imgPath, int p_index);
+    void setImages(const vector<ofImage *> & p_imgs);
+
+    void clearMaps() { m_imgs.clear(); }
+
+    // Attributes
+
+    vector<ofImage *> m_imgs;
+
+private:
+    // Mutators
+
+    void rearrangeLists(ofImage * p_img, int p_index);
+    void freeAllocatedImages();
+
+
+    // Attributes
+
+    // To track if stored ofImages have been allocated by addon or user
+    // (we must not delete user-allocated images)
+    vector<int> m_indicesToDelete;
+    MappingMethod m_method;
+
+    static const size_t SHADERS_TYPES = 3; // Number of different shaders types implemented
     static const char * VERTEX_SHADER_SOURCES_GLSL120[SHADERS_TYPES];
     static const char * FRAGMENT_SHADER_SOURCES_GLSL120[SHADERS_TYPES];
     static const char * VERTEX_SHADER_SOURCES_GLSL330[SHADERS_TYPES];
     static const char * FRAGMENT_SHADER_SOURCES_GLSL330[SHADERS_TYPES];
-    vector<ofImage *> m_imgs;
-    // To track if stored ofImages have been allocated by addon or user
-    // (we must not delete user-allocated images)
-    bool m_selfAllocated[2];
-    // Values used to give parameters to the shaders
-    map<string, float> m_params;
-    MappingMethod m_method;
 };
 }
 }

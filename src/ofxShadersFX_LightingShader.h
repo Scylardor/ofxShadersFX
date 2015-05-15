@@ -93,8 +93,7 @@ private:
     void setupMaterial();
     void setMaterialProperties(vector<unsigned char> & p_buffer, const GLint * p_offsets);
 
-    string getShader(GLenum p_shaderType);
-   // unsigned int getShaderHash(GLenum p_shaderType);
+    virtual string getShader(GLenum p_shaderType) const;
 
     // The shading method (Lambert/flat, Gouraud/vertex, Phong/pixel) used by the shader
     ShadingMethod m_shadingMethod;

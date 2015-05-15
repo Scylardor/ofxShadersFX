@@ -18,11 +18,12 @@ public:
     void end();
 
     ShaderType shaderType() const;
-    virtual string getShader(GLenum ShaderType) = 0;
 
     void setShaderType(ShaderType type);
 
 protected:
+    virtual string getShader(GLenum ShaderType) const = 0;
+
     ShaderType m_type;
     ofShader m_shader;
     bool m_needsReload; // Modifications in shaders set this to true. Set back to false after reload
