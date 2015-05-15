@@ -27,7 +27,11 @@ DisplaceMapShader::~DisplaceMapShader() {
 }
 
 void DisplaceMapShader::begin() {
+    MappingShader::begin();
     m_shader.setUniform1f("maxHeight", m_maxHeight);
+    if (ofIsGLProgrammableRenderer()) {
+        m_shader.setUniformMatrix4f("normalMatrix", m_normalMatrix);
+    }
 }
 
 }

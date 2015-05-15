@@ -107,7 +107,13 @@ void MappingShader::setImage(ofImage * p_img, int p_index) {
         m_indicesToDelete.erase(idxToDelete); // image at this index is no longer allocated
     }
 
-    m_imgs[p_index] = p_img;
+    // Replace image in place if vector is already large enough.
+    const int nbImgs = static_cast<int>(m_imgs.size());
+    if (p_index < nbImgs) {
+        m_imgs[p_index] = p_img;
+    } else {
+        m_imgs.push_back(p_img);
+    }
 }
 
 
