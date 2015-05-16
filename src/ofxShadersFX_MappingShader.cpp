@@ -6,7 +6,7 @@ namespace Mapping
 {
 
 MappingShader::MappingShader(MappingMethod p_method)
-: Shader(MAPPING) {
+: Shader(MAPPING), m_method(p_method) {
 }
 
 
