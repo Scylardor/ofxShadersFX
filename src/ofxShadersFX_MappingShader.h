@@ -74,5 +74,6 @@ private:
 }
 
 #include "ofxShadersFX_DisplaceMapShader.h"
+#include "ofxShadersFX_AlphaBlendingShader.h"
 
 #endif // OFXSHADERSFX_MAPPINGSHADER_H_INCLUDED
