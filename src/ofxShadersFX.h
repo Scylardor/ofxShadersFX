@@ -26,7 +26,7 @@ protected:
 
     ShaderType m_type;
     ofShader m_shader;
-    bool m_needsReload; // Modifications in shaders set this to true. Set back to false after reload
+    bool m_needsReload; // Modifications requiring a reload set this to true. Set back to false after reload
 
 private:
     void reload();
