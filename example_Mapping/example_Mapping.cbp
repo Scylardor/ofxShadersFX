@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="example_Mapping" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="addons/;src/;build config/;addons/ofxShadersFX/src/;" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/$(PROJECT_NAME)_debug" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin" />
+				<Option object_output="obj/Debug/" />
+				<Option external_deps="../../../libs/openFrameworksCompiled/lib/linux64/libopenFrameworksDebug.a;" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Release">
+				<Option output="bin/$(PROJECT_NAME)" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin" />
+				<Option object_output="obj/Release/" />
+				<Option external_deps="../../../libs/openFrameworksCompiled/lib/linux64/libopenFrameworks.a;" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+		</Build>
+		<Unit filename="../../../addons/ofxShadersFX/src/LightingShader_sources.cpp">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/MappingShader_sources.cpp">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX.cpp">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX.h">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_AlphaBlendingShader.cpp">
+			<Option virtualFolder="addons/ofxShadersFX/src/" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_AlphaBlendingShader.h">
+			<Option virtualFolder="addons/ofxShadersFX/src/" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_ColorKeyShader.cpp">
+			<Option virtualFolder="addons/ofxShadersFX/src/" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_ColorKeyShader.h">
+			<Option virtualFolder="addons/ofxShadersFX/src/" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_DisplaceMapShader.cpp">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_DisplaceMapShader.h">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_LightingShader.cpp">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_LightingShader.h">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_MappingShader.cpp">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_MappingShader.h">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxShadersFX/src/ofxShadersFX_Shader.h">
+			<Option virtualFolder="addons/ofxShadersFX/src" />
+		</Unit>
+		<Unit filename="config.make">
+			<Option virtualFolder="build config" />
+		</Unit>
+		<Unit filename="src/main.cpp">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/ofApp.cpp">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/ofApp.h">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
