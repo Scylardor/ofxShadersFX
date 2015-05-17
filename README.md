@@ -1,29 +1,34 @@
 ofxShadersFX
 ============
 
-Shader effects made easy in openFrameworks
+3D shader effects made easy in openFrameworks
 
-ofxShadersFX is an addon for openFrameworks (0.8.0+) to ease the use of common-used shaders in 3D scenes.
+ofxShadersFX is an addon for openFrameworks (0.8.3+) to ease the use of common-used shaders in 3D scenes.
+
+It is currently focused on *lighting* and *mapping*-based effects.
 
 Features
 --------
 
 - *Lighting*
-    - Phong illumination (Vertex and Pixel shader)
-    - Blinn-Phong illumination (Vertex and pixel shader)
+    (both in vertex and pixel shader versions)
+    - Phong
+    - Blinn-Phong
 
-Coming soon (or later):
+- *Mapping*
+    - Displacement mapping
+    - Alpha blending
+    - Color key mapping
+
+Coming soon(er or later):
 - *Lighting*
     - Toon
     - Flat
     - Oren-Nayar
     - Cook-Torrance
-    - Ward anisotropic reflection (brushed metal effect)
+    - Ward anisotropic reflection
 - *Mapping*
-    - Bump mapping
-    - Alpha blending
     - Normal mapping
-    - Color key mapping
 
 
 Requirements
@@ -35,67 +40,61 @@ Requirements
 Quickstart
 ----------
 
-Here's how to create a Lighting shader:
+Example of a lighting shader:
+
+```
+// In header file...
+
+#include "ofxShadersFX.h"
+
+class ofApp {
+public:
+ofxShadersFX::Lighting::LightingShader m_lightShader; // creates a pixel-shaded Blinn-Phong shader by default
+// ...
+
+};
+
+// In .cpp file...
+
+void ofApp::setup() {
+     // Let's say you want to change the lighting effect to some vertex-shaded Phong lighting
+     m_lightShader.setLightingMethod(ofxShadersFX::Lighting::PHONG_LIGHTING);
+     m_lightShader.setShadingMethod(ofxShadersFX::Lighting::VERTEX_SHADING);
+
+     // Use your lights, material and camera configuration of choice.
+     m_lightShader.useLight(&pointLight); // ofLight pointLight
+     m_lightShader.useMaterial(&mat); // ofMaterial mat
+     m_lightShader.useCamera(&cam); // ofEasyCam cam
+     // ...
+}
+
+void ofApp::draw() {
+     // Let sphere be a ofSpherPrimitive you want to light.
+     // If sphere is textured, you can tell the shader to blend the texture color with the lighting:
+     m_lightShader.useTexture(&myTexture); // ofImage myTexture
+
+    cam.begin();
+    m_lightShader.begin();
+    sphere.draw();
+    m_lightShader.end();
+    cam.end();
+}
+```
+
+For a complete example, please check the bundled examples projects (`example_Lighting` and `example_Mapping`).
+These projects should work out-of-the-box after the installation of the addon, if you download their folder in the apps/myApps folder of your OF installation and compile them with the IDE of your choice.
+
+
+To use the ofxShadersFX addon in your own projects:
 
 - Download or clone the ofxShadersFX git repository in your openFrameworks `addons` folder.
 - Create a new openFrameworks project using the project generator, make sure ofxShadersFX is enabled and selected from the list of addons shown.
 - Open your project with you IDE of choice.
 - Now select your ofApp.h file, and add `#include "ofxShadersFX.h"` under `#include "ofMain.h"`.
+- You'll have access to all ofxShaderFX functions. Note you can also include only a particular namespace if you're not interested in others (e.g. #include "ofxShaderFX_Lighting.h")
 
-Declare in your ofApp a LightingShader attribute:
 
-```cpp
-ofxShadersFX::Lighting::LightingShader lshader;
-```
+*Note 1: you normally only have to setup your ofxShadersFX shader once (e.g. in the ```ofApp::setup``` function), and the shader will remember your settings when it works. If you're changing parameters during runtime, the shader will automatically reload itself.*
 
-```LightingShader``` creates a Blinn-Phong pixel (Phong shading) shader by default. You can modify it both the type (Gouraud/Phong shader) and the lighting method (Phong, Blinn-Phong...) of the shader. E.G. to make it a Gouraud shader, put in your `setup`:
 
-```cpp
-lshader.setType(ofxShadersFX::VERTEX_SHADER);
-```
-
-Then, to change from Blinn-Phong to Phong, use ```setMethod```:
-
-```cpp
-lshader.setMethod(ofxShadersFX::Lighting::PHONG);
-```
-
-You now have a Gouraud-shaded Phong lighting shader.
-
-To apply it to your objects, you have to understand that ofxShadersFX shaders don't use their own lights, materials, or camera. They only use those you provide to them. So if you have a point light by which you want a sphere to be Phong illuminated, you have to specify it to the shader.
-
-If you're visualizing 3D, you're probably using some sort of ofCamera (ofEasyCam for example). Providing one to ofxShaderFx shaders is mandatory in OpenGL 3. Let ```my_cam``` be an ```ofCamera```:
-
-```cpp
-lshader.useCamera(&my_cam);
-```
-
-Now let's tell our shader to use a point light. Let's consider ```plight``` as a simple ```ofLight``` in your app:
-
-```cpp
-lshader.useLight(&plight);
-```
-
-Finally, to use a material, e.g. ```mat```:
-
-```cpp
-lshader.useMaterial(&mat)
-```
-
-You're done configuring your Phong shader.
-
-*Note 1*: you only have to do it once (in the ```setup``` function for example), and the shader will remember to use these when it works. If you want to stop using your camera, light, or material, just call ```removeCamera```, ```removeLight``` or ```removeMaterial```. You don't have to pass any parameter to ```removeCamera``` or ```removeMaterial```, since a lighting shader can actually use only one of these, if you tell it to remove them, it will simply discard them.
-
-*Note 2*: all the parameters are pointers, so you have to pass the address (with the ```&```) of objects. If these are dynamically allocated objects (with ```new```), that's your job to ```delete``` them when you want to discard them. However, for *lights*, be sure to do it *after* having removed them from the shader ! Oh, and ```delete``` a pointer you passed to the shader without removing it will probably make your application crash. Be careful !
-
-Finally, to the ```draw``` function. You use an ofxShadersFX shader just like you would use a normal ofShader. So that could be a simple use:
-
-```cpp
-my_cam.begin();
-lshader.begin();
-sphere.draw(); // sphere being an ofSpherePrimitive
-lshader.end();
-my_cam.end();
-```
-
-That's all, your sphere should now be illuminated with Phong's algorithm. Note that enabling / disabling lights used by the shader is useless: it does it automatically for you.
+*Note 2*: most of ofxShadersFX functions parameters are pointers, so you have to pass the address (with the ```&```) of objects. If these are dynamically allocated objects (with ```new```), that's your job to ```delete``` them when you want to discard them. Be careful to remove them from the shader when you delete them, otherwise the shader relies itself on freed memory.
