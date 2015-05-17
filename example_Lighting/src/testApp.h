@@ -31,5 +31,6 @@ class testApp : public ofBaseApp{
     bool bPointLight;
     bool bSpotLight;
     bool bDirLight;
+    bool bShowHelp;
     ofImage tex;
 };

@@ -7,82 +7,116 @@ namespace ofxShadersFX
 {
 namespace Lighting
 {
-    typedef enum
-    {
-        PHONG,
-        BLINNPHONG
-    }	LightingMethod;
+    // For reference:
+    // - flat shading = Lambert shading (this is unsupported);
+    // - vertex shading = Gouraud shading;
+    // - pixel shading = Phong shading.
+    // Phong shading is used by default since it's prettier.
+    // We use VERTEX/PIXEL SHADING names to avoid confusion with some Lighting names.
+    enum ShadingMethod {
+        VERTEX_SHADING = 0,
+        PIXEL_SHADING
+    };
+
+    enum LightingMethod {
+        PHONG_LIGHTING = 0,
+        BLINN_PHONG_LIGHTING
+    };
 
 class LightingShader : public Shader
 {
 public:
-    LightingShader(LightingMethod method=BLINNPHONG, ShaderType type=PIXEL_SHADER,
-                   ofCamera * cam=NULL, ofMaterial * material=NULL, ofImage * image=NULL);
-    ~LightingShader();
+    LightingShader();
+    LightingShader(ShadingMethod p_shadingMethod, LightingMethod p_lightMethod, ofCamera * p_cam=NULL,
+                   ofMaterial * p_material=NULL, ofImage * p_image=NULL);
+    virtual ~LightingShader();
 
+
+    // Base shader functions
     void begin();
     void end();
 
-    LightingMethod method();
+
+    // Accessors
+
+    ShadingMethod shadingMethod() const;
+    LightingMethod lightingMethod() const;
+    const ofCamera * camera() const;
+    const vector<ofLight *> & lights() const;
+    const ofLight * light(size_t index) const;
+    const ofMaterial * material() const;
+    const ofImage * texture() const;
+
+
+    // Mutators
+
     ofCamera * camera();
-    const vector<ofLight *> & lights();
+    vector<ofLight *> & lights();
     ofLight * light(size_t index);
     ofMaterial * material();
     ofImage * texture();
 
-    void setType(ShaderType p_type);
-    void setMethod(LightingMethod method);
-    void useLight(ofLight * light);
-    void useLights(const vector<ofLight*> & lights, bool replace=true);
-    void removeLight(ofLight * light);
-    void useMaterial(ofMaterial * material);
+    void setShadingMethod(ShadingMethod p_method);
+    void setLightingMethod(LightingMethod p_method);
+    void useLight(ofLight * p_light);
+    void useLights(const vector<ofLight*> & p_lights, bool replace=true);
+    void removeLight(ofLight * p_light);
+    void useMaterial(ofMaterial * p_mat);
     void removeMaterial();
-    void useCamera(ofCamera * cam);
-    void useTexture(ofImage * image);
+    void useCamera(ofCamera * p_cam);
+    void useTexture(ofImage * p_img);
     void removeTexture();
     void removeCamera();
 
 private:
+    // Used internally to retrieve shader sources in the sources array without using "magic numbers".
+    enum ShaderSourceIndex {
+        VERTEX_PHONG = 0,
+        TEXTURED_VERTEX_PHONG,
+        VERTEX_BLINN_PHONG,
+        TEXTURED_VERTEX_BLINN_PHONG,
+        PIXEL_PHONG,
+        TEXTURED_PIXEL_PHONG,
+        PIXEL_BLINN_PHONG,
+        TEXTURED_PIXEL_BLINN_PHONG,
+    };
+
     void setupLights();
     void setupProgrammableRendererLights();
     vector<string> generateLightPropsNames();
-    void setLightPosition(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
-    void setLightColors(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
-    void setLightAttenuation(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
-    void setLightSpotProperties(size_t lightIndex, vector<unsigned char> & buffer, const GLint * offsets);
+    void setLightPosition(size_t p_lightIndex, vector<unsigned char> & p_buffer, const GLint * p_offsets);
+    void setLightColors(size_t p_lightIndex, vector<unsigned char> & p_buffer, const GLint * p_offsets);
+    void setLightAttenuation(size_t p_lightIndex, vector<unsigned char> & p_buffer, const GLint * p_offsets);
+    void setLightSpotProperties(size_t p_lightIndex, vector<unsigned char> & p_buffer, const GLint * p_offsets);
     void setupFixedPipelineLights();
 
     void setupMaterial();
-    void setMaterialProperties(vector<unsigned char> & buffer, const GLint * offsets);
+    void setMaterialProperties(vector<unsigned char> & p_buffer, const GLint * p_offsets);
 
-    string getShader(GLenum shaderType);
+    virtual string getShader(GLenum p_shaderType) const;
 
-    // Maximum number of lights
-    // 8 is set to mimic legacy OpenGL limits, but
-    // could be overridden
+    // The shading method (Lambert/flat, Gouraud/vertex, Phong/pixel) used by the shader
+    ShadingMethod m_shadingMethod;
+    LightingMethod m_lightingMethod; // The lighting method (Phong, BlinnPhong...) used by the shader
+    vector<ofLight *> m_lights;
+    // A default material avoids to make the shader compute erroneous lighting
+    // in case no material is provided
+    ofMaterial m_defaultMat;
+    ofCamera * m_cam; // The camera used in programmable pipeline mode
+    ofMaterial * m_mat; // The material which properties are passed to the shaders.
+    ofImage * m_tex; // The texture the shader has to show
+    // After each begin, in programmable pipeline mode, the shader computes the cam normal matrix
+    // in order to feed it to the shader.
+    ofMatrix4x4 m_normalMatrix;
+
+    // Maximum number of lights 8 is set to mimic legacy OpenGL limits, but could be overridden.
     static const size_t MAX_LIGHTS = 8;
-    // Number of light properties in the shaders
-    static const size_t LIGHT_PROPS_NUMBER = 11;
-    // Number of different shaders types implemented
-    static const size_t SHADERS_TYPES = 8;
+    static const size_t LIGHT_PROPS_NUMBER = 11; // Number of light properties in the shaders
+    static const size_t SHADERS_TYPES = 8; // Number of different shaders types implemented
     static const char * VERTEX_SHADER_SOURCES_GLSL120[SHADERS_TYPES];
     static const char * VERTEX_SHADER_SOURCES_GLSL330[SHADERS_TYPES];
     static const char * FRAGMENT_SHADER_SOURCES_GLSL120[SHADERS_TYPES];
     static const char * FRAGMENT_SHADER_SOURCES_GLSL330[SHADERS_TYPES];
-    // The lighting method (Phong, BlinnPhong...) used by the shader
-    LightingMethod m_method;
-    vector<ofLight *> m_lights;
-    ofMaterial * m_mat;
-    // A default material avoids to make the shader compute erroneous lighting
-    // in case no material is provided
-    ofMaterial * m_defaultMat;
-    // The camera used in programmable pipeline mode
-    ofCamera * m_cam;
-    // The texture the shader has to show
-    ofImage * m_tex;
-    // After each begin, in programmable pipeline mode, the shader computes the cam normal matrix
-    // in order to feed it to the shader.
-    ofMatrix4x4 m_normalMatrix;
 };
 }
 }

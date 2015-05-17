@@ -3,10 +3,16 @@
 namespace ofxShadersFX {
     Shader::Shader(ShaderType p_type)
     {
-        setType(p_type);
+        setShaderType(p_type);
     }
 
     void Shader::begin() {
+        // The shader needs reload if not loaded
+        // or if modifications in attributes occurred since last frame
+        if (!m_shader.isLoaded() || m_needsReload) {
+            reload();
+            m_needsReload = false;
+        }
         m_shader.begin();
     }
 
@@ -14,11 +20,11 @@ namespace ofxShadersFX {
         m_shader.end();
     }
 
-    ShaderType Shader::type() const {
+    ShaderType Shader::shaderType() const {
         return m_type;
     }
 
-    void Shader::setType(ShaderType p_type) {
+    void Shader::setShaderType(ShaderType p_type) {
         m_type = p_type;
     }
 
