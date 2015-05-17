@@ -14,8 +14,8 @@ public:
 
     // Accessors
 
-    const ofImage * colormap() const { return m_imgs[0]; }
-    const ofImage * alphaBlendMap() const { return m_imgs[1]; }
+    const ofImage * colormap() const { return (m_imgs.size() > 0 ? m_imgs[0] : NULL); }
+    const ofImage * alphaBlendMap() const { return (m_imgs.size() > 1 ? m_imgs[1] : NULL); }
     float blendAlpha() const { return m_blendAlpha; }
 
 
@@ -23,8 +23,8 @@ public:
 
     void begin();
 
-    ofImage * colormap() { return m_imgs[0]; }
-    ofImage * alphaBlendMap() { return m_imgs[1]; }
+    ofImage * colormap() { return (m_imgs.size() > 0 ? m_imgs[0] : NULL); }
+    ofImage * alphaBlendMap() { return (m_imgs.size() > 1 ? m_imgs[1] : NULL); }
     float & blendAlpha() { return m_blendAlpha; }
 
     void setColormap(ofImage * p_colormap) { setImage(p_colormap, 0); }
@@ -38,7 +38,6 @@ private:
 };
 
 }
-
 }
 
 #endif // OFXSHADERSFX_ALPHABLENDINGSHADER_H_INCLUDED

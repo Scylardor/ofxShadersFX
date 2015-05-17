@@ -29,7 +29,7 @@ public:
     LightingShader();
     LightingShader(ShadingMethod p_shadingMethod, LightingMethod p_lightMethod, ofCamera * p_cam=NULL,
                    ofMaterial * p_material=NULL, ofImage * p_image=NULL);
-    ~LightingShader();
+    virtual ~LightingShader();
 
 
     // Base shader functions

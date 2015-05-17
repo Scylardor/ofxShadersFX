@@ -14,8 +14,8 @@ public:
 
     // Accessors
 
-    const ofImage * colormap() const { return m_imgs[0]; }
-    const ofImage * displacemap() const { return m_imgs[1]; }
+    const ofImage * colormap() const { return (m_imgs.size() > 0 ? m_imgs[0] : NULL); }
+    const ofImage * displacemap() const { return (m_imgs.size() > 1 ? m_imgs[1] : NULL); }
     float maxHeight() const { return m_maxHeight; }
     const ofMatrix4x4 & normalMatrix() const { return m_normalMatrix; }
 
@@ -24,8 +24,8 @@ public:
 
     void begin();
 
-    ofImage * colormap() { return m_imgs[0]; }
-    ofImage * displacemap() { return m_imgs[1]; }
+    ofImage * colormap() { return (m_imgs.size() > 0 ? m_imgs[0] : NULL); }
+    ofImage * displacemap() { return (m_imgs.size() > 1 ? m_imgs[1] : NULL); }
     ofMatrix4x4 & normalMatrix() { return m_normalMatrix; }
 
     void setColormap(ofImage * p_colormap) { setImage(p_colormap, 0); }

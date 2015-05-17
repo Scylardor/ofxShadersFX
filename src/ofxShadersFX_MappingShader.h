@@ -10,15 +10,15 @@ namespace Mapping
 enum MappingMethod {
     DISPLACEMENT = 0,
     ALPHA_BLENDING,
-    NORMAL,
-    COLOR_KEY
+    COLOR_KEY,
+    NORMAL, // Not Implemented
 };
 
 class MappingShader : public Shader
 {
 public:
     MappingShader(MappingMethod p_method);
-    ~MappingShader();
+    virtual ~MappingShader();
 
     void begin();
     void end();
@@ -75,5 +75,6 @@ private:
 
 #include "ofxShadersFX_DisplaceMapShader.h"
 #include "ofxShadersFX_AlphaBlendingShader.h"
+#include "ofxShadersFX_ColorKeyShader.h"
 
 #endif // OFXSHADERSFX_MAPPINGSHADER_H_INCLUDED
