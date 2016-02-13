@@ -42,13 +42,16 @@ protected:
 
     void setImage(ofImage * p_img, int p_index);
     void setImage(const string & p_imgPath, int p_index);
+	void setImage(ofTexture * p_tex, int p_index);
+	void setTexture( ofTexture * p_tex, int p_index );
     void setImages(const vector<ofImage *> & p_imgs);
 
-    void clearMaps() { m_imgs.clear(); }
+	void clearMaps() { m_imgs.clear(); m_texs.clear(); }
 
     // Attributes
 
     vector<ofImage *> m_imgs;
+	vector< ofTexture * >m_texs;
 
 private:
     // Mutators
@@ -61,7 +64,7 @@ private:
 
     // To track if stored ofImages have been allocated by addon or user
     // (we must not delete user-allocated images)
-    vector<int> m_indicesToDelete;
+    vector<int> m_indicesToDelete, m_textureIndicesToDelete;
     MappingMethod m_method;
 
     static const size_t SHADERS_TYPES = 3; // Number of different shaders types implemented
