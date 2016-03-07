@@ -26,14 +26,14 @@ void ofApp::setup(){
     directional.setDirectional();
     directional.setOrientation( ofVec3f(0, 230, 0) );
 
-    colormap.loadImage("earth.jpg");
-    bumpmap.loadImage("earth-bumps.jpg");
-    blendMap.loadImage("clouds.jpg");
-    colorKeyMap.loadImage("colorkey.gif");
+    colormap.load("earth.jpg");
+    bumpmap.load("earth-bumps.jpg");
+    blendMap.load("clouds.jpg");
+    colorKeyMap.load("colorkey.gif");
 
-    displaceSphere.mapTexCoordsFromTexture(colormap.getTextureReference());
-    alphaBlendSphere.mapTexCoordsFromTexture(colormap.getTextureReference());
-    colorKeySphere.mapTexCoordsFromTexture(colormap.getTextureReference());
+    displaceSphere.mapTexCoordsFromTexture(colormap.getTexture());
+    alphaBlendSphere.mapTexCoordsFromTexture(colormap.getTexture());
+    colorKeySphere.mapTexCoordsFromTexture(colormap.getTexture());
 
     target = 0; // First target at the center sphere
     bShowHelp = true;
