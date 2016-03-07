@@ -550,19 +550,11 @@ void LightingShader::setLightSpotProperties(size_t lightIndex, vector<unsigned c
 
 
 void LightingShader::setupFixedPipelineLights() {
-    vector<int> lightIDs(MAX_LIGHTS, -1);
-
     ofEnableLighting();
     for (size_t i = 0; i < m_lights.size(); i++)
     {
         m_lights[i]->enable();
-        // The order in which lights have been declared to OpenGL isn't necessarily the
-        // same as the one in which lights have been added to the shader. Thus, we have
-        // to pass the shader's lights IDs to the shader for it to know which light should
-        // it use.
-        lightIDs[i] = m_lights[i]->getLightID();
     }
-    m_shader.setUniform1iv("lightsIDs", &lightIDs[0], MAX_LIGHTS);
 }
 
 
