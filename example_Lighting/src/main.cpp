@@ -1,19 +1,21 @@
 #include "ofMain.h"
 #include "testApp.h"
-#include "ofAppGlutWindow.h"
-#include "ofGLProgrammableRenderer.h"
+
+#define USE_PROGRAMMABLE_GL
+#ifdef USE_PROGRAMMABLE_GL
+    #include "ofGLProgrammableRenderer.h"
+#endif
 
 //========================================================================
 int main( ){
-    ofAppGlutWindow window;
+    ofGLWindowSettings s;
 
-    // To fall back on the fixed pipeline renderer, comment the following line
-    ofSetCurrentRenderer(ofGLProgrammableRenderer::TYPE);
-	ofSetupOpenGL(&window, 1024,768, OF_WINDOW);			// <-------- setup the GL context
-    window.setDoubleBuffering(true);
-	// this kicks off the running of my app
-	// can be OF_WINDOW or OF_FULLSCREEN
-	// pass in width and height too:
-	ofRunApp(new testApp());
+#ifdef USE_PROGRAMMABLE_GL
+    s.setGLVersion(3, 2);
+#else
+    s.setGLVersion(2, 1);
+#endif
+    ofCreateWindow(s);
+    ofRunApp(new ofApp());
 
 }

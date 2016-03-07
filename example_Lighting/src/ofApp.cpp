@@ -54,14 +54,14 @@ void testApp::setup(){
     mat.setShininess(120);
     ofSetGlobalAmbientColor(ofColor::black);
 
-    tex.loadImage("earth.jpg");
+    tex.load("earth.jpg");
 
     phong.useLight(&spotLight);
     phong.useLight(&directionalLight);
     phong.useLight(&pointLight);
     phong.useMaterial(&mat);
     phong.useCamera(&cam);
-    sphere.mapTexCoordsFromTexture(tex.getTextureReference());
+    sphere.mapTexCoordsFromTexture(tex.getTexture());
 }
 
 //--------------------------------------------------------------

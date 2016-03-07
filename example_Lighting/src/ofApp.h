@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "ofxShadersFX.h"
 
-class testApp : public ofBaseApp{
+class ofApp : public ofBaseApp{
 
 	public:
 		void setup();
