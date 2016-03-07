@@ -1,14 +1,21 @@
 #include "ofMain.h"
 #include "ofApp.h"
 
+//#define USE_PROGRAMMABLE_GL
+#ifdef USE_PROGRAMMABLE_GL
+    #include "ofGLProgrammableRenderer.h"
+#endif
+
 //========================================================================
 int main( ){
-	//ofSetCurrentRenderer(ofGLProgrammableRenderer::TYPE);
-	ofSetupOpenGL(1024,768,OF_WINDOW);			// <-------- setup the GL context
+    ofGLWindowSettings s;
 
-	// this kicks off the running of my app
-	// can be OF_WINDOW or OF_FULLSCREEN
-	// pass in width and height too:
-	ofRunApp(new ofApp());
+#ifdef USE_PROGRAMMABLE_GL
+    s.setGLVersion(3, 2);
+#else
+    s.setGLVersion(2, 1);
+#endif
+    ofCreateWindow(s);
+    ofRunApp(new ofApp());
 
 }
