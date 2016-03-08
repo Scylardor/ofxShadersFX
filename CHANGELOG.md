@@ -1,3 +1,18 @@
+3.0.1
+=====
+	General
+	-------
+
+	- Fix a bug in Lighting shaders that broke Lighting in OpenGL2. Only spotlights seemed to work.
+	It seems it was a problem in the system of light IDs we were using to determine if a light was on or not.
+	OpenGL3 versions were unaffected.
+	- The shader sources in "readable" format are now part of the repo. They're very useful e.g. to reason about the
+	logic of the shader code, compared to the minified versions embedded in ofxShadersFX source code.
+	- Made some misc changes in the example projects to match current openFrameworks standards. This mainly includes
+	replacing deprecated functions and renaming.
+	- The whole project goes MIT license. You can do whatever you want with it as long as you mention the original authors.
+	- Added QBS project files so we can start and work with the example projects in Qt Creator IDE.
+
 3.0
 ===
 
