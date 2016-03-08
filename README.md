@@ -7,6 +7,11 @@ ofxShadersFX is an addon for openFrameworks (0.8.3+) to ease the use of common-u
 
 It is currently focused on *lighting* and *mapping*-based effects.
 
+The addon is supposed to be both OpenGL 2 (fixed pipeline) and OpenGL 3 (programmable pipeline) compatible.
+
+If you notice a compatibility issue or any other bug, please report! 
+
+
 Features
 --------
 
