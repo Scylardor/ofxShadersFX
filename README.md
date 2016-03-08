@@ -1,3 +1,5 @@
+![ofxShadersFx Preview](ofxaddons_thumbnail.png?raw=true "Lighting example")
+
 ofxShadersFX
 ============
 
