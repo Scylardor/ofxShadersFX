@@ -39,8 +39,10 @@ public:
 
     void setColormap(ofImage * p_colormap) { setImage(p_colormap, 0); }
     void setColormap(const string & p_colormapPath) { setImage(p_colormapPath, 0); }
+	void setColorMap( ofTexture * p_colormap ) { setTexture( p_colormap, 0 ); }
     void setDisplaceMap(ofImage * p_displacemap) { setImage(p_displacemap, 1); }
     void setDisplaceMap(const string & p_displacemapPath) { setImage(p_displacemapPath, 1); }
+	void setDisplaceMap( ofTexture * p_displacemapPath ) { setTexture( p_displacemapPath, 1 ); }
     void setMaximumHeight(float p_height) { m_maxHeight = p_height; }
     void setNormalMatrix(const ofMatrix4x4 & p_mat) { m_normalMatrix = p_mat; }
 

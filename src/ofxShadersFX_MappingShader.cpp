@@ -35,6 +35,16 @@ void MappingShader::begin() {
             m_imgs[i]->bind();
         }
     }
+
+	for( unsigned int i = 0; i < m_texs.size(); ++i ) {
+		if( m_texs[ i ] != NULL ) {
+			stringstream number( "" );
+			number << i;
+
+			m_shader.setUniformTexture( string( "tex" ) + number.str(), ( *m_texs[ i ] ), i + 1 );
+			m_texs[ i ]->bind();
+		}
+	}
 }
 
 
@@ -45,6 +55,12 @@ void MappingShader::end() {
             m_imgs[i]->unbind();
         }
     }
+
+	for( unsigned int i = 0; i < m_texs.size(); ++i ) {
+		if( m_texs[ i ] != NULL ) {
+			m_texs[ i ]->unbind();
+		}
+	}
 }
 
 
@@ -77,8 +93,13 @@ void MappingShader::freeAllocatedImages() {
 
         delete m_imgs[imgIdxToDelete];
     }
-}
 
+	for( unsigned int i = 0; i < m_textureIndicesToDelete.size(); ++i ) {
+		const int imgIdxToDelete = m_textureIndicesToDelete[ i ];
+
+		delete m_texs[ imgIdxToDelete ];
+	}
+}
 
 void MappingShader::rearrangeLists(ofImage * p_img, int p_index) {
     m_imgs.insert(m_imgs.begin() + p_index, p_img);
@@ -140,7 +161,27 @@ void MappingShader::setImage(const string & p_imgPath, int p_index) {
 }
 
 
-void MappingShader::setImages(const vector<ofImage *> & p_imgs) {
+void MappingShader::setTexture( ofTexture * p_tex, int p_index )
+{
+	// Delete the image at target index if it was allocated.
+	vector<int>::iterator idxToDelete = find( m_textureIndicesToDelete.begin(), m_textureIndicesToDelete.end(), p_index );
+
+	if( idxToDelete != m_textureIndicesToDelete.end() ) {
+		delete m_texs[ ( *idxToDelete ) ];
+		m_textureIndicesToDelete.erase( idxToDelete ); // image at this index is no longer allocated
+	}
+
+	// Replace image in place if vector is already large enough.
+	const int nbImgs = static_cast< int >( m_texs.size() );
+	if( p_index < nbImgs ) {
+		m_texs[ p_index ] = p_tex;
+	}
+	else {
+		m_texs.push_back( p_tex );
+	}
+}
+
+void MappingShader::setImages( const vector<ofImage *> & p_imgs ) {
     freeAllocatedImages();
     m_imgs = p_imgs;
 }
