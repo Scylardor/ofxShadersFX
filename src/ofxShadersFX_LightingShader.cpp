@@ -365,22 +365,22 @@ void LightingShader::setupProgrammableRendererLights() {
         glGetActiveUniformBlockiv (m_shader.getProgram(), uniformBlockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &uniformBlockSize);
 
         vector<string> names = generateLightPropsNames();
-        vector<const GLchar *> glnames;
+        vector<const GLchar *> glnames(names.size());
 
-        for (vector<string>::iterator str = names.begin(); str != names.end(); ++str)
-        {
-            glnames.push_back(str->c_str());
-        }
+		for (int iName = 0; iName < names.size(); ++iName)
+		{
+			glnames[iName] = names[iName].c_str();
+		}
 
         const GLchar **glnames_ptr = &glnames[0];
-        GLuint indices[glnames.size()];
+		vector<GLuint> indices(glnames.size());
 
-        glGetUniformIndices(m_shader.getProgram(), glnames.size(), glnames_ptr, indices);
+        glGetUniformIndices(m_shader.getProgram(), glnames.size(), glnames_ptr, &indices[0]);
 
         vector<GLint> lightUniformOffsets(glnames.size());
 
         glGetActiveUniformsiv(m_shader.getProgram(), lightUniformOffsets.size(),
-                              indices, GL_UNIFORM_OFFSET, &lightUniformOffsets[0]);
+                              &indices[0], GL_UNIFORM_OFFSET, &lightUniformOffsets[0]);
 
         GLint *offsets = &lightUniformOffsets[0];
         const unsigned int uboSize (uniformBlockSize);
