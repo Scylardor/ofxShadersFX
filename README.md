@@ -38,10 +38,23 @@ Coming soon(er or later):
     - Normal mapping
 
 
-Requirements
-------------
+How to use it
+-------------
 
-- openFrameworks 0.8.3+ (may be compatible with older releases, that's not guaranteed)
+To use the ofxShadersFX addon in your own projects:
+
+- Download or clone the ofxShadersFX git repository in your openFrameworks `addons` folder.
+- Create a new openFrameworks project using the project generator, make sure ofxShadersFX is enabled and selected from the list of addons shown.
+- Open your project with you IDE of choice.
+- Now select your ofApp.h file, and add `#include "ofxShadersFX.h"` under `#include "ofMain.h"`.
+- You'll have access to all ofxShaderFX functions. Note you can also include only a particular namespace if you're not interested in others (e.g. #include "ofxShaderFX_Lighting.h")
+
+
+*Note 1: you normally only have to setup your ofxShadersFX shader once (e.g. in the ```ofApp::setup``` function), and the shader will remember your settings when it works. If you're changing parameters during runtime, the shader will automatically reload itself.*
+
+
+*Note 2*: most of ofxShadersFX functions parameters are pointers, so you have to pass the address (with the ```&```) of objects. If these are dynamically allocated objects (with ```new```), that's your job to ```delete``` them when you want to discard them. Be careful to remove them from the shader when you delete them, otherwise the shader relies itself on freed memory.
+
 
 
 Quickstart
@@ -92,16 +105,9 @@ For a complete example, please check the bundled examples projects (`example_Lig
 These projects should work out-of-the-box after the installation of the addon, if you download their folder in the apps/myApps folder of your OF installation and compile them with the IDE of your choice.
 
 
-To use the ofxShadersFX addon in your own projects:
 
-- Download or clone the ofxShadersFX git repository in your openFrameworks `addons` folder.
-- Create a new openFrameworks project using the project generator, make sure ofxShadersFX is enabled and selected from the list of addons shown.
-- Open your project with you IDE of choice.
-- Now select your ofApp.h file, and add `#include "ofxShadersFX.h"` under `#include "ofMain.h"`.
-- You'll have access to all ofxShaderFX functions. Note you can also include only a particular namespace if you're not interested in others (e.g. #include "ofxShaderFX_Lighting.h")
+Requirements
+------------
 
+- openFrameworks 0.8.3+, tested on 0.9.8 (may be compatible with other releases, that's not guaranteed)
 
-*Note 1: you normally only have to setup your ofxShadersFX shader once (e.g. in the ```ofApp::setup``` function), and the shader will remember your settings when it works. If you're changing parameters during runtime, the shader will automatically reload itself.*
-
-
-*Note 2*: most of ofxShadersFX functions parameters are pointers, so you have to pass the address (with the ```&```) of objects. If these are dynamically allocated objects (with ```new```), that's your job to ```delete``` them when you want to discard them. Be careful to remove them from the shader when you delete them, otherwise the shader relies itself on freed memory.
