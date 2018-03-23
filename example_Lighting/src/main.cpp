@@ -1,5 +1,5 @@
 #include "ofMain.h"
-#include "testApp.h"
+#include "ofApp.h"
 
 #define USE_PROGRAMMABLE_GL
 #ifdef USE_PROGRAMMABLE_GL
